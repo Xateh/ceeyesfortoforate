@@ -18,20 +18,40 @@ python -m pip install --upgrade pip
 
 On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` instead.
 
-Install **one** PyTorch build before the other dependencies:
+Install **one** PyTorch build before the other dependencies. Choose based on
+**your GPU model and driver**, rather than simply whether you have an NVIDIA GPU.
+Run only the command for your case, with the virtual environment activated.
+
+**NVIDIA GeForce RTX 50-series (including RTX 5060 Ti): use CUDA 12.8 (`cu128`).**
+These Blackwell GPUs require the newer GPU support; do not use `cu126` for them.
 
 ```bash
-# CPU (Linux/Windows; sufficient for the offline smoke test)
-python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
+```
 
-# OR NVIDIA GPU (Linux/Windows, with a compatible driver)
+**Other NVIDIA GPUs / NUS SoC cluster:** check the GPU model and driver with
+`nvidia-smi`, then choose a supported build from the
+[official PyTorch 2.8 installation options](https://pytorch.org/get-started/previous-versions/#v280).
+For example, use the following **only if your GPU and driver support this build**:
+
+```bash
 python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu126
 ```
 
-On macOS, use `python -m pip install torch==2.8.0`; the smoke test uses CPU.
-If the cluster requires a different CUDA wheel, use the
-[official PyTorch 2.8 installation options](https://pytorch.org/get-started/previous-versions/#v280).
-Check compatibility with the allocated machine's driver before installing.
+**CPU only (Linux/Windows):** sufficient for the offline smoke test.
+
+```bash
+python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+```
+
+**macOS:** use `python -m pip install torch==2.8.0`; the smoke test uses CPU.
+
+If you started installing the wrong build, press **Ctrl+C** to cancel. If it
+already installed, run `python -m pip uninstall -y torch` before installing the
+correct build above. You do not need a separate CUDA Toolkit installation for
+these prebuilt wheels, but you do need a compatible NVIDIA driver.
+
+After the chosen PyTorch installation finishes, install the remaining dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -62,7 +82,7 @@ Face (allow several hundred MB and additional RAM for an optimizer step).
 The QA head is newly initialised; the corresponding warning is expected.
 This check does not train a usable QA system or measure answer quality.
 
-On the intended GPU, **inside an allocated compute session**, run:
+On your own NVIDIA GPU, or **inside an allocated compute session** on a cluster, run:
 
 ```bash
 nvidia-smi
