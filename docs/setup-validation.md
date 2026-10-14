@@ -19,18 +19,24 @@ the BERT encoder and QA head. The full-model run loaded
 `86b5e0934494bd15c9632b12f734a8a67f723594`, with a newly initialised QA head.
 These are environment checks using one artificial example, not QA results.
 
-## Remaining check for issue #1
+## Sean's local CPU and GPU validation
 
-This environment has no NVIDIA GPU or authenticated NUS SoC cluster session.
-The intended-GPU/cluster smoke test is **pending**. In an allocated GPU session,
-follow the README installation steps and run:
+Sean supplied successful smoke-test JSON reports on 14 October 2026 from his
+local PC, using Python 3.12.10, PyTorch 2.8.0+cu128, CUDA runtime 12.8,
+Transformers 4.57.1, Datasets 4.3.0 and Accelerate 1.10.1.
 
-```bash
-nvidia-smi
-python scripts/smoke_test.py --device cuda --output outputs/smoke-bert-gpu.json
-python -m pip freeze > outputs/environment.txt
-```
+| Run | Device | Loss | Elapsed seconds | Result |
+| --- | --- | --- | --- | --- |
+| Tiny offline BERT | CPU | 2.780924 | 0.401 | Passed |
+| Pretrained BERT | CPU | 2.834783 | 165.786 | Passed |
+| Pretrained BERT | NVIDIA GeForce RTX 5060 Ti (CUDA) | 3.014746 | 1.801 | Passed |
 
-Record the GPU, cluster allocation command (without credentials), PyTorch/CUDA
-versions and successful result in the PR before closing issue #1. Keep detailed
-generated reports under `outputs/`; commit only a small summary here if useful.
+The GPU report was generated at 2026-10-14 12:16:54 UTC. Both full-model runs
+used the checkpoint revision recorded above and produced logits of shape
+`[1, 17]`. All three reports confirm finite loss/gradients and updates to both
+the encoder and QA head. Timings include setup/model loading and are not
+training-throughput benchmarks.
+
+The intended local GPU check for issue #1 is complete. NUS SoC cluster execution
+has not been tested; validate there separately if the team later uses it.
+Keep the original generated reports under local `outputs/`.
