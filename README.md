@@ -18,25 +18,28 @@ python -m pip install --upgrade pip
 
 On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` instead.
 
-Install **one** PyTorch build before the other dependencies. Choose based on
-**your GPU model and driver**, rather than simply whether you have an NVIDIA GPU.
-Run only the command for your case, with the virtual environment activated.
+Install **one** PyTorch build before the other dependencies, with the virtual
+environment activated.
 
-**NVIDIA GeForce RTX 50-series (including RTX 5060 Ti): use CUDA 12.8 (`cu128`).**
-These Blackwell GPUs require the newer GPU support; do not use `cu126` for them.
-
-```bash
-python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
-```
-
-**Other NVIDIA GPUs / NUS SoC cluster:** check the GPU model and driver with
-`nvidia-smi`, then choose a supported build from the
+**NVIDIA GPU:** check the GPU model and driver with `nvidia-smi`, then choose a
+supported build from the
 [official PyTorch 2.8 installation options](https://pytorch.org/get-started/previous-versions/#v280).
-For example, use the following **only if your GPU and driver support this build**:
+For example:
 
-```bash
-python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu126
-```
+- **NVIDIA GeForce RTX 50-series (including RTX 5060 Ti):** use CUDA 12.8
+  (`cu128`). These Blackwell GPUs require the newer GPU support; do not use
+  `cu126` for them.
+
+  ```bash
+  python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
+  ```
+
+- **Other NVIDIA GPUs / NUS SoC cluster:** `cu126` is another option, **only if
+  your GPU and driver support this build**.
+
+  ```bash
+  python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu126
+  ```
 
 **CPU only (Linux/Windows):** sufficient for the offline smoke test.
 
