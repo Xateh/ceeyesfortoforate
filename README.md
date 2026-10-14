@@ -26,16 +26,15 @@ supported build from the
 [official PyTorch 2.8 installation options](https://pytorch.org/get-started/previous-versions/#v280).
 For example:
 
-- **NVIDIA GeForce RTX 50-series (including RTX 5060 Ti):** use CUDA 12.8
-  (`cu128`). These Blackwell GPUs require the newer GPU support; do not use
-  `cu126` for them.
+- **CUDA 12.8 (`cu128`):** supports RTX 50-series GPUs; requires a compatible
+  NVIDIA driver.
 
   ```bash
   python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
   ```
 
-- **Other NVIDIA GPUs / NUS SoC cluster:** `cu126` is another option, **only if
-  your GPU and driver support this build**.
+- **CUDA 12.6 (`cu126`):** for compatible GPUs and drivers; does not support
+  RTX 50-series GPUs.
 
   ```bash
   python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu126
