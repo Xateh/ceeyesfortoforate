@@ -136,3 +136,11 @@ work before building on it. No one is tied to a particular pipeline stage.
 Each member must keep track of their actual AI-tool use for their declaration.
 Acknowledge reused code and external resources. The smoke test follows the
 [Hugging Face QA model interface](https://huggingface.co/docs/transformers/tasks/question_answering).
+
+## Provisional reranker core (issue #10)
+
+See [the reranker interface and objective notes](docs/reranker.md) for the
+adapter-facing CPU scorer, basic/full feature groups, model persistence, local
+CLI and synthetic tests. This does not yet train on real #9 data or perform
+final evaluation. Run `python -m unittest discover -s tests -v` in the pinned
+environment for the small CPU test suite.
