@@ -1,0 +1,28 @@
+# Local environments and Python caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Local credentials and editor/OS files
+.env
+.env.*
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Data, downloaded models, checkpoints and experiment outputs
+data/
+checkpoints/
+outputs/
+logs/
+.cache/
+wandb/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
