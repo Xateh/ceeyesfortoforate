@@ -57,7 +57,15 @@ subtract that question's mean feature vector and mean target. Minimize:
 `mean_over_informative_questions(mean_over_candidates((centered_z @ w -
 centered_target)^2)) + alpha * ||w||^2`
 
-The default positive ridge penalty is `alpha=1`; it is configurable. This
+The default positive ridge penalty is `alpha=1`; it is configurable. The solver
+uses a CPU SVD of the weighted, centered design, avoiding the loss of small
+penalties when forming normal equations for correlated features. Singular values
+at or below `float64_epsilon * max(design.shape) * largest_singular_value` are
+treated as numerical null directions. Ridge shrinkage is applied to the remaining
+directions using `hypot(singular_value, sqrt(alpha))` to avoid underflow when
+squaring tiny singular values. Signals below the numerical rank tolerance cannot
+be recovered by choosing an arbitrarily small penalty. Nonfinite preprocessing and solver failures
+raise `ValueError` without replacing a previously fitted model. This
 centered least-squares objective focuses on relative candidate quality and gives
 each informative question equal total loss weight despite variable shortlist
 lengths. It is a provisional choice, not an agreed team objective or a claim

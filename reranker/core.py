@@ -193,17 +193,35 @@ class Reranker:
         z = (x - mean) / scale
         y = torch.tensor(ys, dtype=torch.float64, device="cpu")
         width = len(self.features.names)
-        gram = torch.zeros((width, width), dtype=torch.float64, device="cpu")
-        rhs = torch.zeros(width, dtype=torch.float64, device="cpu")
-        # Each informative question has equal total weight, irrespective of count.
-        for group in informative:
-            a = z[group] - z[group].mean(dim=0)
-            b = y[group] - y[group].mean()
-            weight = 1.0 / (len(informative) * len(b))
-            gram += weight * (a.T @ a)
-            rhs += weight * (a.T @ b)
-        coef = torch.linalg.solve(gram + self.alpha * torch.eye(width, dtype=torch.float64, device="cpu"), rhs)
-        if not all(torch.isfinite(t).all().item() for t in (mean, scale, z, coef)):
+        if not all(torch.isfinite(t).all().item() for t in (mean, scale, z)):
+            raise ValueError("numeric overflow during fitting; rescale inputs")
+        # Each informative question has equal total loss weight. A direct SVD
+        # ridge solve avoids squaring the design's condition number; discard
+        # numerical null directions so tiny alpha cannot amplify roundoff.
+        coef = torch.zeros(width, dtype=torch.float64, device="cpu")
+        if informative:
+            design, response = [], []
+            for group in informative:
+                a = z[group] - z[group].mean(dim=0)
+                b = y[group] - y[group].mean()
+                weight = math.sqrt(1.0 / (len(informative) * len(b)))
+                design.append(weight * a)
+                response.append(weight * b)
+            design = torch.cat(design)
+            response = torch.cat(response)
+            try:
+                u, singular, vh = torch.linalg.svd(design, full_matrices=False)
+                cutoff = torch.finfo(design.dtype).eps * max(design.shape) * singular[0]
+                # s / (s*s + alpha), evaluated without squaring tiny values.
+                denominator = torch.hypot(singular,
+                                          torch.full_like(singular, math.sqrt(self.alpha)))
+                shrink = torch.where(singular > cutoff,
+                                     (singular / denominator) / denominator,
+                                     torch.zeros_like(singular))
+                coef = vh.T @ (shrink * (u.T @ response))
+            except torch.linalg.LinAlgError as error:
+                raise ValueError("numerically unstable fit; rescale inputs or increase alpha") from error
+        if not torch.isfinite(coef).all().item():
             raise ValueError("numeric overflow during fitting; rescale inputs")
         self._state = {"mean": mean, "scale": scale, "coef": coef,
                        "training_questions": len(questions),

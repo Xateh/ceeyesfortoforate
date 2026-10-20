@@ -1,4 +1,6 @@
 import copy
+from decimal import Decimal, localcontext
+import math
 import json
 import subprocess
 import sys
@@ -242,6 +244,52 @@ class RerankerTests(unittest.TestCase):
         second = R(self.basic).fit(repeated, repeated_labels)
         torch.testing.assert_close(first._state["coef"], second._state["coef"], atol=1e-15, rtol=0)
 
+
+    def test_collinear_features_with_tiny_penalty(self):
+        questions = [Q("q", [C("a", "first", {"x": 0., "y": 0.}),
+                              C("b", "second", {"x": 1., "y": 1.})])]
+        labels = {"q": {"a": 0., "b": 1.}}
+        for alpha in (1., 1e-20, 1e-300):
+            with self.subTest(alpha=alpha), tempfile.TemporaryDirectory() as tmp:
+                model = R(F(("x", "y")), alpha=alpha).fit(questions, labels)
+                # Standardized columns are identical [-1, 1]; the analytic
+                # symmetric ridge solution has both weights 0.5 / (2 + alpha).
+                expected = torch.full((2,), 0.5 / (2. + alpha), dtype=torch.float64)
+                torch.testing.assert_close(model._state["coef"], expected,
+                                           atol=1e-14, rtol=0.)
+                self.assertEqual(model.predict(questions), {"q": "second"})
+                path = Path(tmp) / "model.json"
+                model.save(path)
+                self.assertEqual(R.load(path).scores(questions), model.scores(questions))
+
+    def test_subnormal_penalty_and_small_singular_value(self):
+        alpha, delta = 5e-324, 1e-162
+        questions = [Q("signal", [C("a", "a", {"x": -delta}),
+                                   C("b", "b", {"x": delta})]),
+                     Q("scaling", [C("a", "a", {"x": -1.}),
+                                    C("b", "b", {"x": 1.})])]
+        labels = {"signal": {"a": 0., "b": 1.}, "scaling": {"a": 0., "b": 0.}}
+        model = R(F(("x",)), alpha=alpha).fit(questions, labels)
+        # Only the first question is informative. Its standardized inputs are
+        # +/- amplitude, so the scalar optimum is (amplitude/2)/(amplitude^2+alpha).
+        # Decimal supplies an independent oracle where the square is below the
+        # float64 representable range; scaling still uses all training rows.
+        with localcontext() as context:
+            context.prec = 100
+            amplitude = Decimal.from_float(delta) / Decimal.from_float(math.sqrt(.5))
+            expected = float((amplitude / 2) /
+                             (amplitude * amplitude + Decimal.from_float(alpha)))
+        self.assertAlmostEqual(model._state["coef"].item() / expected, 1., delta=1e-14)
+        self.assertEqual(model.predict([questions[0]]), {"signal": "b"})
+
+    def test_numeric_overflow_refit_preserves_model(self):
+        model = R(self.basic).fit(self.questions, self.targets)
+        before = model.scores(self.questions)
+        questions = [Q("q", [C("a", "first", {"score": 1e308}),
+                              C("b", "second", {"score": 1e308})])]
+        with self.assertRaisesRegex(ValueError, "numeric overflow"):
+            model.fit(questions, {"q": {"a": 0., "b": 1.}})
+        self.assertEqual(model.scores(self.questions), before)
 
     def test_adapter_and_cli_end_to_end(self):
         self.assertEqual(questions_from_records(records(self.questions)), self.questions)
