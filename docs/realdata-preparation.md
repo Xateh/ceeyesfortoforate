@@ -108,3 +108,50 @@ replacement for download/storage accounting. PyArrow streams 256 rows per batch
 with threaded reads disabled. No unrelated numerical/model suite is required for
 this separate preparation module. The supplied evaluator's exact bytes/hash and
 executable conformance remain unresolved; this pilot does not access it.
+
+## Verify an existing preparation receipt
+
+`preparation_receipt.verify_receipt(directory, expected_inventory_sha256)` and
+its CLI validate saved outputs without opening source assets, tokenizing,
+loading a model or executing a scorer. The verifier uses only the standard
+library. Keep the producer's successful exit receipt and the SHA-256 of
+`artifact-hashes.json` in a separately trusted record; supply that retained hash:
+
+```sh
+python preparation_receipt.py --receipt /path/to/existing-output \
+  --inventory-sha256 "$TRUSTED_PREPARATION_INVENTORY_SHA256"
+python -m unittest discover -s tests -p test_preparation_receipt.py -v
+```
+
+Computing a new expected hash from an untrusted bundle does not authenticate it.
+The verifier checks the caller's pin, then the exact seven-artifact hash map,
+regular-file membership, strict JSON and a 64 MiB total input-size ceiling.
+Missing/extra files, symlinks, failure receipts, duplicate JSON keys and nonfinite
+numbers fail. Use an immutable local snapshot; concurrent filesystem writers
+are outside this interface. The execution and memory limits above still apply.
+
+It checks the pinned draft, producer-code hash and declared source/tokenizer
+identities; reconstructs article components and seed-42 role assignment from the
+manifest; verifies counts and exact ordered pilot coverage; and checks context
+hashes, role identities, label-free input keys and token-window domains. Saved
+offsets must reproduce gold text and per-window alignment classifications.
+Summary counts and retained exception lists must agree with those records.
+No fixed 997/3 success threshold is imposed. Run this test file separately from
+suites importing optional packages; one test confirms its standard-library-only
+import boundary.
+
+A successful result says `verified_preparation_receipt` and explicitly sets
+`training_readiness_established` to false. It proves consistency with the supplied
+pin, not authenticity of that pin, actual source execution, tokenizer-to-token-ID
+conformance, unseen source completeness or the truth of a recorded successful
+exit. Full untruncated context offsets are not saved, so their classifications
+are checked for structural consistency but cannot be independently recomputed.
+The two-pass reproduction flag is a producer assertion; this verifier recomputes
+only the recorded manifest's split. Package versions are recorded nonempty
+strings, not an environment compatibility guarantee. The pinned producer hash is
+intentional: changed producer bytes require deliberate verifier review.
+
+This preserves all alignment exceptions. It makes no decision about dropping,
+widening or relabelling them, no team split agreement, no official scorer claim
+and no supervised-training readiness claim. Synthetic tests are hand-authored
+receipts with toy token IDs, not tokenizer outputs or scorer results.
