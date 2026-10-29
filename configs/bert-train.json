@@ -15,8 +15,8 @@
     "lr_scheduler": "linear",
     "max_grad_norm": 1.0,
     "precision": "auto",
-    "logging_steps": 50,
-    "save_steps": 500,
+    "logging_steps": 100,
+    "save_steps": 5000,
     "save_total_limit": 2,
     "dataloader_num_workers": 2,
     "smoke": {
