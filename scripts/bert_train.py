@@ -10,13 +10,11 @@ Outputs, in --output-dir (default checkpoints/<run_name>, or <run_name>-smoke):
     final/               final model + tokenizer, loadable with from_pretrained()
     run_info.json        config, device, precision, package versions, metrics
     train_log.jsonl      one line per logging step (loss, learning rate, ...)
-    train.log            the script's messages
     environment.txt      pip freeze
 """
 
 import argparse
 import json
-import logging
 import platform
 import subprocess
 import sys
@@ -35,8 +33,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preprocessing import METADATA_COLUMNS, load_examples, span_text
 
 MODEL_INPUTS = ("input_ids", "token_type_ids", "attention_mask")
-log = logging.getLogger("train_bert")
-
 
 def load_tokenized(path):
     path = Path(path)
@@ -63,8 +59,8 @@ class JsonlLogger(TrainerCallback):
     def on_log(self, args, state, control, logs=None, **kwargs):
         if state.is_world_process_zero and logs:
             with open(self.path, "a", encoding="utf-8") as handle:
-                handle.write(json.dumps({"step": state.global_step, "epoch": state.epoch, **logs}) + "\n")
-            log.info("step %d: %s", state.global_step, logs)
+                handle.write(json.dumps({"time": datetime.now(timezone.utc).isoformat(),
+                                         "step": state.global_step, "epoch": state.epoch, **logs}) + "\n")
 
 def best_span(start_logits, end_logits, offsets, n_best=20, max_answer_tokens=30):
     best, best_score = None, -np.inf
@@ -99,12 +95,11 @@ def check_reload(final_dir, eval_features, examples_path, device, n_windows=32):
         exact += text in example["answers"]["text"]
         predictions.append({"question": example["question"], "predicted": text,
                             "gold": example["answers"]["text"][0]})
-    log.info("Reloaded %s (tokenizer: %s) and predicted %d windows; %d exactly match a gold "
-             "answer (sanity check only, not an evaluation).",
-             final_dir, type(tokenizer).__name__, len(rows), exact)
-    for p in predictions[:3]:
-        log.info("  Q: %s | predicted: %r | gold: %r", p["question"], p["predicted"], p["gold"])
-    return {"windows": len(rows), "exact_match_windows": exact, "examples": predictions[:3]}
+    print(f"Reloaded {final_dir} (tokenizer: {type(tokenizer).__name__}) and predicted {len(rows)} "
+         f"windows; {exact} exactly match a gold answer (sanity check only, not an evaluation).")
+    for p in predictions[:5]:
+        print(f"  Q: {p['question']} | predicted: {p['predicted']!r} | gold: {p['gold']!r}")
+    return {"windows": len(rows), "exact_match_windows": exact, "examples": predictions[:5]}
 
 
 def main():
@@ -142,9 +137,6 @@ def main():
         parser.error(f"{run_dir} already has checkpoints; use --resume or a new --output-dir.")
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s",
-                        handlers=[logging.StreamHandler(),
-                                  logging.FileHandler(run_dir / "train.log", encoding="utf-8")])
     set_seed(settings["seed"])
 
     train = load_tokenized(settings["train_data"]).remove_columns(list(METADATA_COLUMNS))
@@ -213,10 +205,10 @@ def main():
                                 text=True, check=True).stdout
         (run_dir / "environment.txt").write_text(freeze, encoding="utf-8")
     except (OSError, subprocess.CalledProcessError):
-        log.warning("Could not run pip freeze; environment.txt not written.")
-    log.info("Training on %s (%s, %s): %d windows, effective batch %d (%d x %d accumulation)",
-             device, info["gpu"] or "no GPU", precision, len(train), settings["effective_batch_size"],
-             settings["per_device_batch_size"], accumulation)
+        print("Warning: could not run pip freeze; environment.txt not written.")
+    print(f"Training on {device} ({info['gpu'] or 'no GPU'}, {precision}): {len(train)} windows, "
+           f"effective batch {settings['effective_batch_size']} "
+           f"({settings['per_device_batch_size']} x {accumulation} accumulation)")
 
     started = time.perf_counter()
     train_result = trainer.train(resume_from_checkpoint=True if args.resume else None)
@@ -237,9 +229,8 @@ def main():
         "reload_check": check_reload(final_dir, eval_features, settings["eval_examples"], device),
     })
     info_path.write_text(json.dumps(info, indent=2) + "\n", encoding="utf-8")
-    log.info("PASS: trained %d steps, last train loss %.4f, internal_val loss %.4f; saved %s",
-             train_result.global_step, last_loss, eval_metrics["eval_loss"], final_dir)
-
+    print(f"PASS: trained {train_result.global_step} steps, last train loss {last_loss:.4f}, "
+           f"internal_val loss {eval_metrics['eval_loss']:.4f}; saved {final_dir}")
 
 if __name__ == "__main__":
     main()
