@@ -1,0 +1,5 @@
+{
+    "model": "google-bert/bert-base-uncased",
+    "max_length": 384,
+    "doc_stride": 128
+  }
