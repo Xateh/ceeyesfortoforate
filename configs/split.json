@@ -1,0 +1,8 @@
+{
+    "seed": 4248,
+    "fractions": {
+      "bert_train": 0.75,
+      "reranker_train": 0.15,
+      "internal_val": 0.10
+    }
+  }
