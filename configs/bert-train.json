@@ -1,0 +1,32 @@
+{
+    "run_name": "bert-base-baseline",
+    "model": "google-bert/bert-base-uncased",
+    "train_data": "data/tokenized/bert_train",
+    "eval_data": "data/tokenized/internal_val",
+    "eval_examples": "data/splits/internal_val.json",
+    "seed": 42,
+    "learning_rate": 3e-05,
+    "num_train_epochs": 2,
+    "effective_batch_size": 12,
+    "per_device_batch_size": 12,
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01,
+    "adam_epsilon": 1e-06,
+    "lr_scheduler": "linear",
+    "max_grad_norm": 1.0,
+    "precision": "auto",
+    "logging_steps": 100,
+    "save_steps": 5000,
+    "save_total_limit": 2,
+    "dataloader_num_workers": 2,
+    "smoke": {
+      "train_windows": 256,
+      "eval_windows": 64,
+      "max_steps": 20,
+      "effective_batch_size": 8,
+      "per_device_batch_size": 4,
+      "logging_steps": 5,
+      "save_steps": 10,
+      "dataloader_num_workers": 0
+    }
+  }
