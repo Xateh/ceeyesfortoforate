@@ -10,7 +10,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-EVALUATOR_PATH = Path(__file__).resolve().parent / "evaluate-v2.0.py"
+EVALUATOR_PATH = Path(__file__).resolve().parent.parent / "evaluate-v2.0.py"
 
 _spec = importlib.util.spec_from_file_location("official_squad_evaluator", EVALUATOR_PATH)
 official = importlib.util.module_from_spec(_spec)
