@@ -15,8 +15,7 @@ Place the official `evaluate-v2.0.py` in the root folder.
 ## BERT baseline evaluation
 
 ```bash
-python scripts/bert_predict.py 
-python scripts/bert_predict.py --checkpoint --max-answer-length --output-dir --batch-size
+python scripts/bert_predict.py --checkpoint --split --max-answer-length --output-dir --batch-size
 ```
 
 For each question, over all its windows:
@@ -36,7 +35,4 @@ For each question, over all its windows:
 | Split | EM | F1 | Checkpoint | Settings |
 | --- | ---: | ---: | --- | --- |
 | `internal_val` | 65.40% | 79.29% | `bert-base-baseline/final` | max answer length 30, n-best 20, max-context |
-
-Reference: Google's BERT-Base with the same hyperparameters, trained on the
-full training set, reports 81.2 EM / 88.4 F1 on dev. Expect slightly lower here,
-since our BERT trains on 75% of the training articles.
+| `dev` | 80.02% | 87.55% | `bert-base-baseline/final` | max answer length 30, n-best 20, max-context |
