@@ -25,14 +25,13 @@ For each question, over all its windows:
   `[SEP]` or padding), start ≤ end, and it is at most `max_answer_length` (30)
   WordPiece tokens;
 - score = start logit + end logit; the highest-scoring valid span wins;
-- overlapping windows: with `max_context_only` (default), a span may only start
-  at a token in the window where that token has the most context on both
-  sides, as in Google's `run_squad.py`. Tokens near a window edge are thus
-  scored by the window that sees them best.
+- overlapping windows all compete using raw scores; no max-context filtering is applied.
 
 ## Baseline results
 
 | Split | EM | F1 | Checkpoint | Settings |
 | --- | ---: | ---: | --- | --- |
-| `internal_val` | 65.40% | 79.29% | `bert-base-baseline/final` | max answer length 30, n-best 20, max-context |
-| `dev` | 80.02% | 87.55% | `bert-base-baseline/final` | max answer length 30, n-best 20, max-context |
+| `internal_val` | 65.40% | 79.29% | `bert-base-baseline/final` | max answer length 30, n-best 20, all windows |
+| `dev` | 80.02% | 87.55% | `bert-base-baseline/final` | max answer length 30, n-best 20, all windows |
+
+See [candidate generation](candidates.md) for label-free top-20 span export.

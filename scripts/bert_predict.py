@@ -1,4 +1,4 @@
-"""Baseline: make predictions using a BERT checkpoint and score with squad_eval.
+"""Make baseline predictions or export top-20 spans using a BERT checkpoint.
 
 For each question, every window is scored; the answer is the best valid span
 over all of the question's windows (so overlapping windows compete):
@@ -8,6 +8,7 @@ over all of the question's windows (so overlapping windows compete):
 
 Usage:
     python scripts/bert_predict.py --checkpoint checkpoints/bert-base-baseline/final --split dev
+    python scripts/bert_predict.py --split reranker_train --candidates
 """
 
 import argparse
@@ -16,36 +17,46 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import torch
-from datasets import load_from_disk
-from transformers import AutoModelForQuestionAnswering
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from preprocessing import load_examples
-from squad_eval import evaluate
+from span_candidates import N_BEST, candidate_records, select_candidates
 
-EXAMPLES = { 
+EXAMPLES = {
+    "reranker_train": "data/splits/reranker_train.json",
     "internal_val": "data/splits/internal_val.json",
     "dev": "data/dev-v1.1.json",
 }
-N_BEST = 20  # top start/end positions considered per window (Google's n_best_size)
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--checkpoint", default="checkpoints/bert-base-baseline/final")
     parser.add_argument("--split", choices=EXAMPLES, default="internal_val",
-                        help="internal_val or dev (only for the final evaluation)")
+                        help="reranker_train, internal_val or dev (only for final evaluation)")
     parser.add_argument("--max-answer-length", type=int, default=30,
                         help="Longest answer in tokens (Google's default: 30).")
     parser.add_argument("--output-dir", type=Path, default=Path("outputs/bert-base-baseline"))
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--candidates", action="store_true",
+                        help="Save up to 20 unique spans per question without evaluating gold answers.")
     args = parser.parse_args()
+    if args.max_answer_length < 1 or args.batch_size < 1:
+        parser.error("--max-answer-length and --batch-size must be positive")
+    if args.split == "reranker_train" and not args.candidates:
+        parser.error("reranker_train requires --candidates")
     examples_path, features_path = EXAMPLES[args.split], f"data/tokenized/{args.split}"
+
+    import torch
+    from datasets import load_from_disk
+    from transformers import AutoModelForQuestionAnswering
+    from preprocessing import load_examples
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = AutoModelForQuestionAnswering.from_pretrained(args.checkpoint).to(device).eval()
     features = load_from_disk(features_path)
+
+    if len(features) == 0:
+        raise ValueError(f"No tokenized windows found for {args.split}")
 
     # start/end scores for every window.
     inputs = features.select_columns(["input_ids", "token_type_ids", "attention_mask"])
@@ -57,22 +68,41 @@ def main():
             end_logits.append(output.end_logits.cpu().numpy())
     start_logits, end_logits = np.concatenate(start_logits), np.concatenate(end_logits)
 
-    # best valid span per question across all windows
-    contexts = {example["id"]: example["context"] for example in load_examples(examples_path)}
-    best = {}  # question id -> (score, answer text)
-    for i, (qid, offsets) in enumerate(zip(features["example_id"], features["offset_mapping"])):
-        for s in np.argsort(start_logits[i])[-N_BEST:]:
-            for e in np.argsort(end_logits[i])[-N_BEST:]:
-                if offsets[s] is None or offsets[e] is None:  # question, special or padding token
-                    continue
-                if e < s or e - s + 1 > args.max_answer_length:
-                    continue
-                score = start_logits[i][s] + end_logits[i][e]
-                if qid not in best or score > best[qid][0]:
-                    best[qid] = (score, contexts[qid][offsets[s][0]:offsets[e][1]])
-    predictions = {qid: best[qid][1] if qid in best else "" for qid in contexts}
+    examples = load_examples(examples_path)
+    contexts = {example["id"]: example["context"] for example in examples}
+    if len(contexts) != len(examples):
+        raise ValueError("Duplicate question IDs in source data")
+    candidates = select_candidates(
+        contexts, features["example_id"], features["offset_mapping"],
+        start_logits, end_logits, args.max_answer_length,
+        max_candidates=20 if args.candidates else 1,
+    )
+    predictions = {qid: spans[0]["answer"] if spans else "" for qid, spans in candidates.items()}
+
+    if args.candidates:
+        payload = {
+            "schema_version": 1,
+            "metadata": {
+                "split": args.split, "checkpoint": str(args.checkpoint),
+                "examples_path": examples_path, "features_path": features_path,
+                "max_answer_length": args.max_answer_length, "n_best": N_BEST,
+                "max_candidates": 20, "batch_size": args.batch_size,
+                "device": str(device), "numpy_version": np.__version__,
+                "torch_version": torch.__version__, "logit_dtype": str(start_logits.dtype),
+                "tie_break": "first occurrence in baseline traversal",
+                "max_context_only": False,
+            },
+            "questions": candidate_records(examples, candidates),
+        }
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        path = args.output_dir / f"{args.split}_candidates.json"
+        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
+                        encoding="utf-8")
+        print(f"{args.split}: saved candidates for {len(examples)} questions to {path}")
+        return
 
     # score & save
+    from squad_eval import evaluate
     scores = evaluate(examples_path, predictions)
     metrics = {"split": args.split, "exact": scores["exact"], "f1": scores["f1"], "total": scores["total"],
                "checkpoint": str(args.checkpoint), "max_answer_length": args.max_answer_length,
