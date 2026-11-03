@@ -78,9 +78,9 @@ def main():
                "checkpoint": str(args.checkpoint), "max_answer_length": args.max_answer_length,
                "n_best": N_BEST}
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    (args.output_dir / "{args.split}_predictions.json").write_text(
+    (args.output_dir / f"{args.split}_predictions.json").write_text(
         json.dumps(predictions, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    (args.output_dir / "{args.split}_metrics.json").write_text(
+    (args.output_dir / f"{args.split}_metrics.json").write_text(
         json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
     print(f"{args.split}: EM {metrics['exact']:.2f}, F1 {metrics['f1']:.2f} "
           f"({metrics['total']} questions); saved to {args.output_dir}")
