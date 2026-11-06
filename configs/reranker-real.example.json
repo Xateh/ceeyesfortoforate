@@ -1,0 +1,132 @@
+{
+  "schema": "cs4248.real-reranker-run/0.1.0-draft",
+  "status": "real_provisional",
+  "policy": {
+    "id": "proposed-basic5-full15-f1-ridge",
+    "decision_reference": null,
+    "acceptance": "explicit_run_policy_not_team_agreement",
+    "features": {
+      "basic": {
+        "spec_id": "candidate-features/0.1.0-draft",
+        "basic": [
+          "bert_start_logit",
+          "bert_end_logit",
+          "span_token_count",
+          "answer_has_digit",
+          "answer_initial_upper"
+        ],
+        "compatibility": [
+          "q_who",
+          "q_what",
+          "q_when",
+          "q_where",
+          "q_why",
+          "q_how",
+          "q_which",
+          "q_other",
+          "when_digit_match",
+          "who_initial_upper_match"
+        ],
+        "group": "basic"
+      },
+      "full": {
+        "spec_id": "candidate-features/0.1.0-draft",
+        "basic": [
+          "bert_start_logit",
+          "bert_end_logit",
+          "span_token_count",
+          "answer_has_digit",
+          "answer_initial_upper"
+        ],
+        "compatibility": [
+          "q_who",
+          "q_what",
+          "q_when",
+          "q_where",
+          "q_why",
+          "q_how",
+          "q_which",
+          "q_other",
+          "when_digit_match",
+          "who_initial_upper_match"
+        ],
+        "group": "full"
+      }
+    },
+    "alphas": [
+      1.0
+    ],
+    "target": "repository-scorer-f1-max-normalized-nonempty-golds/1",
+    "no_signal": "error",
+    "selection": "internal_val_f1_then_em_then_first_alpha"
+  },
+  "inputs": {
+    "source_train": {
+      "path": null,
+      "sha256": null
+    },
+    "bert_train": {
+      "path": null,
+      "sha256": null
+    },
+    "reranker_train": {
+      "path": null,
+      "sha256": null
+    },
+    "internal_val": {
+      "path": null,
+      "sha256": null
+    },
+    "train_candidates": {
+      "path": null,
+      "sha256": null
+    },
+    "validation_candidates": {
+      "path": null,
+      "sha256": null
+    },
+    "validation_baseline": {
+      "path": null,
+      "sha256": null
+    }
+  },
+  "baseline_generation": {
+    "checkpoint": null,
+    "max_answer_length": null,
+    "n_best": null,
+    "max_candidates": null,
+    "logit_dtype": null,
+    "tie_break": null,
+    "max_context_only": null,
+    "numpy_version": null,
+    "torch_version": null,
+    "device": null
+  },
+  "scorer": {
+    "source_status": "repository_bytes_course_origin_unverified",
+    "source_reference": "https://github.com/Xateh/ceeyesfortoforate/tree/d11a5ea32cc1f213001b378d048c2c0550e7130b",
+    "hashes": {
+      "evaluate-v2.0.py": "710840ce2c2c61716334c056777032f24660b83eb9869a451036e6a24d8103c4",
+      "scripts/squad_eval.py": "80df866a5788741632fae24207357b4012a34b39189ba9ad82e3790b1af4d961"
+    }
+  },
+  "lineage": {
+    "status": "caller_attested_lineage_not_origin_authentication",
+    "relationship_reference": null,
+    "checkpoint_export_value": null,
+    "checkpoint_files": {},
+    "tokenizer_files": {},
+    "run_info": {
+      "path": null,
+      "sha256": null
+    },
+    "train_log": {
+      "path": null,
+      "sha256": null
+    },
+    "environment": {
+      "path": null,
+      "sha256": null
+    }
+  }
+}
