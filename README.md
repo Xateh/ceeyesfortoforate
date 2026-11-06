@@ -10,7 +10,6 @@ Use Python **3.11 or 3.12**. Run commands from the repository root.
 ```bash
 git clone https://github.com/Xateh/ceeyesfortoforate.git
 cd ceeyesfortoforate
-git switch 1-project-setup  # Until this branch is merged into main.
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
@@ -122,9 +121,10 @@ See [validation notes](docs/setup-validation.md) for what has actually been run.
 Scripts should create generated directories as needed. Keep data and weights
 out of Git; record their download/source locations and settings in documentation.
 Commit small configuration files and result summaries needed to reproduce runs.
-The data pipeline will split SQuAD training articles into BERT-training,
-reranker-training and internal-validation sets. Official dev-v1.1 is reserved
-for final evaluation.
+The merged data pipeline uses the Canvas training data and seed-4248 75/15/10
+article split; see [split details](docs/data-split.md). Team documentation already
+reports [baseline internal-validation and dev results](docs/eval.md). Freeze
+reranker settings without consulting official dev before final comparisons.
 
 ## Team workflow
 
@@ -142,5 +142,5 @@ Acknowledge reused code and external resources. The smoke test follows the
 See [the reranker interface and objective notes](docs/reranker.md) for the
 adapter-facing CPU scorer, basic/full feature groups, model persistence, local
 CLI and synthetic tests. This does not yet train on real #9 data or perform
-final evaluation. Run `python -m unittest discover -s tests -v` in the pinned
-environment for the small CPU test suite.
+final evaluation. See [current status and separate-process regression commands](docs/reranker-status.md)
+for the active candidate adapter, model wrapper and remaining dependencies.

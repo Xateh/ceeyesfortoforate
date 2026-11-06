@@ -58,12 +58,14 @@ no-signal default failure and no implicit fallback. The status is an explicit
 caller attestation, not a detector of real versus synthetic data. This entry point
 is for tiny invented fixtures only, not an approved real-label training path.
 
-The returned model is the existing core. Its save/reload preserves named feature
-order and learned preprocessing, but does NOT bind this adapter profile, feature
-spec version, candidate artifact or checkpoint provenance to the saved model.
-Keep the adaptation audit/config alongside it; a production-bound persistence
-wrapper remains follow-up work. Existing SyntheticRun/HeldoutRun and their older
-bundle formats are unchanged and are not silently bypassed or relabelled.
+`fit_synthetic_pair` returns the standalone core, whose persistence does not bind
+this adapter profile or upstream provenance. For adapter-aware synthetic
+save/reload, use the implemented [TeamCandidateModel wrapper](team-model.md).
+It binds the exact feature registry, declared generation identity and training
+membership; it still does not authenticate checkpoint/tokenizer bytes or enable
+real-label training. Existing SyntheticRun/HeldoutRun retain their older draft
+bundle formats and are not interchangeable with PR28 exports. See the
+[current reconciliation](reranker-status.md) for the active paths and dependencies.
 
 The focused synthetic suite is `python -m unittest discover -s tests -p
 'test_team_candidates.py' -v`. It exercises conversion plus actual tiny core
@@ -76,5 +78,6 @@ Next inputs: PR28 export bytes and baseline answer mappings, verified source
 split/checkpoint/tokenizer identities, and accepted feature/target definitions
 with supplied-scorer provenance. The merged seed-4248 75/15/10 split governs
 assignments; the old seed-42 pilot is retained only as historical evidence.
-Team BERT/evaluator implementations are not duplicated. No real-label fit,
-official-dev execution or publication was performed for this increment.
+Team BERT/evaluator implementations are not duplicated. No real-label fit or
+official-dev execution was performed for this increment. The adapter was subsequently
+published; see the dated reconciliation for current branch status.

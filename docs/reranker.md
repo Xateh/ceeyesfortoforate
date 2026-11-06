@@ -1,14 +1,17 @@
 # Reranker core — provisional issue #10 interface
 
-This is a bounded, synthetic-data implementation, not completion of the actual
-training/evaluation work in issue #10. It is based on setup PR #17 at
-`c97807538f6ab4dea32c350a65c96b8ae20cae4e`. The user approved this local
-dependent branch before setup merged; no assignment, push, or PR is part of this
-work. Requirements from issues [#10](https://github.com/Xateh/ceeyesfortoforate/issues/10)
-and [#9](https://github.com/Xateh/ceeyesfortoforate/issues/9) were read on
-2026-10-17. The [final proposal](https://docs.google.com/document/d/1OJk-LjXQUl51oHKlchZh3eJXMWZLE0E3yYZVBI4THFo/edit)
-describes overlap supervision and comparison with/without question-type features.
-Neither source fixes a shared file schema or exact objective.
+The core began as a bounded synthetic implementation on 17 October 2026,
+based on setup PR #17 at `c97807538f6ab4dea32c350a65c96b8ae20cae4e`.
+The original local-only approval excluded publication; later approvals published
+the reranker stack. That original restriction is historical, not today's status.
+See [current reconciliation and run instructions](reranker-status.md) for the
+active PR28 adapter, inherited PRs, merged team code and remaining issue dependencies.
+
+Requirements from issues [#10](https://github.com/Xateh/ceeyesfortoforate/issues/10)
+and [#9](https://github.com/Xateh/ceeyesfortoforate/issues/9) and the
+[final proposal](https://docs.google.com/document/d/1OJk-LjXQUl51oHKlchZh3eJXMWZLE0E3yYZVBI4THFo/edit)
+informed the original core. The feature and objective choices below remain
+provisional. Synthetic software checks do not complete real-data training or evaluation.
 
 ## Adapter boundary
 
@@ -124,16 +127,17 @@ python -m reranker train --questions train.json --targets targets.json \
   --features features.json --model checkpoints/reranker-basic.json
 python -m reranker predict --questions validation-inputs.json \
   --model checkpoints/reranker-basic.json --output outputs/predictions-basic.json
-OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m unittest discover -s tests -v
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 CUDA_VISIBLE_DEVICES="" \
+  python -m unittest discover -s tests -p test_reranker.py -v
 ```
 
-Train only on the separate reranker-training partition. Generate validation
-predictions without passing its labels to fit; use the supplied scorer maintained
-by the evaluation owner. Choose any hyperparameters on internal validation and
-keep official dev-v1.1 for the final evaluation. This module cannot detect
-upstream article overlap or enforce split provenance; #2/#9 must supply that
-contract. Actual SQuAD/BERT training, candidate generation, feature engineering,
-split creation, ablation evaluation and final scoring have not been run here.
+These CLI examples demonstrate the generic core interface; they do not establish
+real-data feature, target or provenance approval. Use the active adapter described
+in [the current status](reranker-status.md) for PR28 exports. Fit preprocessing
+only on reranker-training inputs, keep validation labels out of fitting, and
+freeze settings before final comparisons. Team documentation already reports
+baseline official-dev results; official dev must not be described as untouched.
+The core alone cannot establish split membership or upstream provenance.
 
 ## Review and next integration step
 

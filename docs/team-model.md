@@ -77,8 +77,10 @@ real evaluator conformance remain outside this synthetic implementation.
 
 ## Verification
 
-Run `python -m unittest discover -s tests -p test_team_model.py -v` under the shared
-600-second ledger, one CPU/thread, CUDA disabled and 1 GiB cap. The suite uses the
+Run `python -m unittest discover -s tests -p test_team_model.py -v` with one
+CPU/thread, CUDA disabled and the task-specific memory/runtime limits. The old
+600-second pilot ledger is historical experiment accounting, not an SSH quota.
+See [current regression instructions](reranker-status.md). The suite uses the
 existing invented PR28 fixtures. It checks both groups, two unseen batches,
 round-trip scores/selections and frozen state with fit forbidden during reload;
 exact score ties before/after reload, including reversed supplied candidate order;
