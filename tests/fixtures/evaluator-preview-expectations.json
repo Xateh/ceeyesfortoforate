@@ -1,0 +1,17 @@
+{
+  "status": "preview_derived_expectations_not_executable_conformance",
+  "source_reference": "https://canvas.nus.edu.sg/courses/97044/files/folder/Project/qa?preview=9898802",
+  "preview_filename": "evaluate-v2.0.py",
+  "evidence": "Source preview read by preparation worker on 2026-10-22 at approximately 15:12 SGT; exact original bytes unavailable. No source reconstructed or retrieved by this task.",
+  "official_source_sha256": null,
+  "executed_against_supplied_evaluator": false,
+  "units": "per-question EM/F1 in [0,1]; CLI summary metrics may use percentages",
+  "cases": [
+    {"name":"case_punctuation_articles_space", "prediction":"  The CAT!  ", "golds":["a cat"], "expected_em":1, "expected_f1":1},
+    {"name":"multiset_overlap", "prediction":"cat cat", "golds":["cat dog"], "expected_em":0, "expected_f1":0.5},
+    {"name":"empty_after_normalization", "prediction":"the", "golds":["a", "!!!"], "expected_em":1, "expected_f1":1},
+    {"name":"ignore_normalized_empty_gold_when_nonempty_exists", "prediction":"", "golds":["the", "cat"], "expected_em":0, "expected_f1":0},
+    {"name":"multiple_gold_maxima", "prediction":"whale", "golds":["blue whale", "whale"], "expected_em":1, "expected_f1":1},
+    {"name":"no_gold_fallback_empty", "prediction":"", "golds":[], "expected_em":1, "expected_f1":1}
+  ]
+}

@@ -1,138 +1,60 @@
 # CS4248 G19 — BERT QA answer reranking
 
-We compare a BERT extractive QA baseline, a lightweight reranker, and a reranker
-with question–answer type compatibility features on SQuAD v1.1.
+We compare a fine-tuned BERT extractive QA baseline with basic and question-type-aware
+linear rerankers on SQuAD v1.1. The rerankers choose among supplied BERT spans;
+they do not generate new answers or retrain BERT.
 
 ## Setup
 
-Use Python **3.11 or 3.12**. Run commands from the repository root.
+Use Python 3.11 or 3.12 and run commands from the repository root.
 
 ```bash
-git clone https://github.com/Xateh/ceeyesfortoforate.git
-cd ceeyesfortoforate
-git switch 1-project-setup  # Until this branch is merged into main.
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
-```
-
-On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` instead.
-
-Install **one** PyTorch build before the other dependencies, with the virtual
-environment activated.
-
-**NVIDIA GPU:** check the GPU model and driver with `nvidia-smi`, then choose a
-supported build from the
-[official PyTorch 2.8 installation options](https://pytorch.org/get-started/previous-versions/#v280).
-For example:
-
-- **CUDA 12.8 (`cu128`):** supports RTX 50-series GPUs; requires a compatible
-  NVIDIA driver.
-
-  ```bash
-  python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
-  ```
-
-- **CUDA 12.6 (`cu126`):** for compatible GPUs and drivers; does not support
-  RTX 50-series GPUs.
-
-  ```bash
-  python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu126
-  ```
-
-**CPU only (Linux/Windows):** sufficient for the offline smoke test.
-
-```bash
+# CPU build; sufficient for reranker training and the offline tests.
 python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
-```
-
-**macOS:** use `python -m pip install torch==2.8.0`; the smoke test uses CPU.
-
-If you started installing the wrong build, press **Ctrl+C** to cancel. If it
-already installed, run `python -m pip uninstall -y torch` before installing the
-correct build above. You do not need a separate CUDA Toolkit installation for
-these prebuilt wheels, but you do need a compatible NVIDIA driver.
-
-After the chosen PyTorch installation finishes, install the remaining dependencies:
-
-```bash
 python -m pip install -r requirements.txt
 python -m pip check
 ```
 
-Direct dependencies are pinned. CUDA/CPU builds and transitive packages can
-differ between machines; save `python -m pip freeze` with experiment outputs.
-Do not install torchvision or torchaudio for this text-only project.
+On Windows, activate with `.venv\Scripts\Activate.ps1`. On macOS, install
+`torch==2.8.0` without the CPU index. For BERT GPU work, install a compatible
+[PyTorch 2.8 CUDA build](https://pytorch.org/get-started/previous-versions/#v280)
+instead of the CPU build; RTX 50-series requires the CUDA 12.8 option.
+Use an allocated compute node for cluster workloads, not a login node.
 
-## Verify the environment
-
-First, run the small offline test. It builds a randomly initialised, two-layer
-BERT QA model and needs no model download, dataset or GPU:
+An offline environment check uses a tiny randomly initialized model:
 
 ```bash
 python scripts/smoke_test.py --tiny --device cpu --output outputs/smoke-cpu.json
 ```
 
-Then test the actual generally pretrained BERT checkpoint:
+This checks software, not QA accuracy. See [setup validation](docs/setup-validation.md)
+for recorded environment checks. Keep data, weights and generated outputs outside Git.
 
-```bash
-python scripts/smoke_test.py --device cpu --output outputs/smoke-bert-cpu.json
-```
+## Pipeline
 
-The first full-model run downloads `google-bert/bert-base-uncased` from Hugging
-Face (allow several hundred MB and additional RAM for an optimizer step).
-The QA head is newly initialised; the corresponding warning is expected.
-This check does not train a usable QA system or measure answer quality.
-
-On your own NVIDIA GPU, or **inside an allocated compute session** on a cluster, run:
-
-```bash
-nvidia-smi
-python scripts/smoke_test.py --device cuda --output outputs/smoke-bert-gpu.json
-python -m pip freeze > outputs/environment.txt
-```
-
-For NUS SoC, use the cluster's current GPU allocation instructions; do not run
-training on a login node. Scheduler, queue and account details must come from
-your actual cluster access. This repository does not assume a scheduler.
-If compute nodes cannot access the internet, download/cache the model where
-network access is allowed and make that Hugging Face cache available to the job.
-`HF_HOME` can select a cache directory outside Git.
-
-Success prints `PASS` and saves a JSON report with package versions, model
-revision, device/GPU, seed, loss and elapsed time. The script checks finite
-loss/gradients, correct logit shapes and updates to both encoder and QA-head
-weights. `--device cuda` fails if CUDA is unavailable; it never falls back to CPU.
-The tiny test is a software check, not evidence that full BERT works on the GPU.
-
-See [validation notes](docs/setup-validation.md) for what has actually been run.
-
-## Project layout
-
-| Path | Purpose |
+| Step | Entry point / guide |
 | --- | --- |
-| `scripts/` | Runnable preprocessing, training and evaluation scripts |
-| `configs/` | Small, version-controlled experiment settings |
-| `docs/` | Setup and methodology notes |
-| `data/` | Local raw/processed data and split manifests (ignored) |
-| `checkpoints/` | Local saved model weights (ignored) |
-| `outputs/` | Predictions, metrics and environment reports (ignored) |
-| `logs/` | Runtime logs (ignored) |
+| Article-disjoint train-derived splits | [Data splits](docs/data-split.md) |
+| BERT tokenization | [Preprocessing](docs/preprocessing.md) |
+| BERT training and baseline predictions | `scripts/bert_train.py`, `scripts/bert_predict.py` |
+| Candidate adaptation, reranker training and reload | [Reranker guide](docs/reranker.md) |
+| Shared EM/F1 evaluation | [Evaluation](docs/eval.md) |
 
-Scripts should create generated directories as needed. Keep data and weights
-out of Git; record their download/source locations and settings in documentation.
-Commit small configuration files and result summaries needed to reproduce runs.
-The data pipeline will split SQuAD training articles into BERT-training,
-reranker-training and internal-validation sets. Official dev-v1.1 is reserved
-for final evaluation.
+The team split uses seed 4248 and 75/15/10 article allocation. BERT optimizer
+seed 42 is separate. Reranker fitting uses only reranker_train; official dev is
+reserved for frozen final comparisons. Team documentation already reports baseline
+dev scores, so dev must not be described as untouched.
 
-## Team workflow
+## Current reranker result
 
-Pick an unassigned issue whose dependencies are merged, then assign yourself
-before starting. Usually use one issue, one branch and one PR; include a short
-verification command and `Closes #<issue>` in the PR. Review and merge dependent
-work before building on it. No one is tied to a particular pipeline stage.
+Both variants have completed provisional real-data fits and exact save/reload
+checks. On 9,131 internal-validation questions, supplied BERT scored **65.40 EM /
+79.29 F1**, basic **63.93 / 76.78**, and full **63.89 / 76.77**. Neither reranker
+beat the baseline. The [guide](docs/reranker.md) explains the policy, inputs,
+commands and unresolved provenance; internal validation was also used upstream.
 
-Each member must keep track of their actual AI-tool use for their declaration.
-Acknowledge reused code and external resources. The smoke test follows the
-[Hugging Face QA model interface](https://huggingface.co/docs/transformers/tasks/question_answering).
+Xu An's reranker work builds on Hai's data/BERT/evaluator pipeline and Sean's
+candidate exporter. Implementation, tests, review and documentation used Codex
+assistance. Each member should review and disclose their actual AI use in the report.
