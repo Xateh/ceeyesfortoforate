@@ -1,158 +1,178 @@
-# Reranker core — provisional issue #10 interface
+# Reranker guide
 
-The core began as a bounded synthetic implementation on 17 October 2026,
-based on setup PR #17 at `c97807538f6ab4dea32c350a65c96b8ae20cae4e`.
-The original local-only approval excluded publication; later approvals published
-the reranker stack. That original restriction is historical, not today's status.
-See [current reconciliation and run instructions](reranker-status.md) for the
-active PR28 adapter, inherited PRs, merged team code and remaining issue dependencies.
+The CPU reranker selects one supplied BERT candidate per question. Use
+[`reranker.real_training`](../reranker/real_training.py) for real labels and
+[`team_candidates`](../reranker/team_candidates.py) for Sean's schema-1 exports.
+The baseline is the fine-tuned BERT span selector, not another learned reranker.
+Its candidates use raw start/end logits across valid windows without max-context filtering.
 
-Requirements from issues [#10](https://github.com/Xateh/ceeyesfortoforate/issues/10)
-and [#9](https://github.com/Xateh/ceeyesfortoforate/issues/9) and the
-[final proposal](https://docs.google.com/document/d/1OJk-LjXQUl51oHKlchZh3eJXMWZLE0E3yYZVBI4THFo/edit)
-informed the original core. The feature and objective choices below remain
-provisional. Synthetic software checks do not complete real-data training or evaluation.
+## Inputs
 
-## Adapter boundary
+Use the team's seed-4248, 75/15/10 article split. Supply these seven JSON files
+as `inputs` entries in the run manifest, each with `path` and exact `sha256`:
 
-Import `Candidate`, `Question`, `FeatureConfig`, and `Reranker` from
-`reranker`. A candidate has a nonempty candidate ID, supplied answer text,
-and a mapping of named finite numeric features. A question has a nonempty
-question ID and a nonempty ordered candidate sequence. IDs are unique within
-their respective question/batch. A single candidate is valid. Answer strings
-are preserved exactly, including Unicode and empty strings. Candidate generation,
-span validity, feature extraction and question-type encoding remain upstream.
+| Key | File |
+| --- | --- |
+| `source_train` | Original training `train-v1.1.json` |
+| `bert_train` | `data/splits/bert_train.json` |
+| `reranker_train` | `data/splits/reranker_train.json` |
+| `internal_val` | `data/splits/internal_val.json` |
+| `train_candidates` | `reranker_train_candidates.json` |
+| `validation_candidates` | `internal_val_candidates.json` |
+| `validation_baseline` | Matching `internal_val_predictions.json` |
 
-`FeatureConfig(basic=("score", "length"), compatibility=("type_match",),
-group="basic" or "full")` explicitly lists ordered feature names. These example
-names are placeholders, not a team agreement. Basic uses only the basic list;
-full adds the compatibility list. The adapter must classify **all** question-type
-features (including raw question-type encodings) as compatibility if the intended
-ablation removes all question-type information. No features are discovered from
-data. Extra feature keys are ignored, including invalid values; missing selected
-features and invalid selected values fail. Categorical features must be encoded
-upstream with a fixed vocabulary or training-only fitting.
+Team artifacts are in the repository's [releases](https://github.com/Xateh/ceeyesfortoforate/releases):
+`data-v1`, `bert-finetuned-v1` and `candidate-exports-v1`. The adapter targets
+exporter revision `e56efaa1aacfa5d547286137375ab398baaeefeb`. No separate training
+baseline file is required; training first answers are derived from the candidates.
+Fitting from exports needs no BERT execution or model-weight loading.
 
-Targets are a **separate** mapping:
-`{question_id: {candidate_id: score}}`, with exact ID coverage and finite scores
-in [0, 1]. A provisional interpretation is candidate token-overlap F1 against
-the gold answers, produced by #9. This code does not compute labels, read gold
-answers, split data, or implement an evaluator. Token normalization, multiple
-gold-answer aggregation and shortlist/no-useful-answer policy need agreement
-with #9 and the evaluation owner.
+Before fitting, the runner checks the full source/split union, exact identities,
+disjoint question/article/exact-context sets, complete candidate coverage and
+validation baseline parity. It preserves supplied order and declared float32/float64
+logit sums and 1–20 unique spans per question. Spans are exact Unicode code-point
+slices `[start, end)`; identical text at different offsets remains distinct.
+Only source-to-export question comparison
+applies the producer's `.strip()`; source/split text, contexts, answers and IDs stay exact.
 
-Known gold/label/target/F1/EM feature-name tokens are rejected in configuration.
-This is a guardrail, not proof of provenance: the adapter must never disguise
-gold-derived information under an allowed name. Answer text and IDs are never
-converted to features. Only the explicit feature allowlist enters the scorer.
+## Features and fitting
 
-## Provisional objective and edge cases
+Feature spec `candidate-features/0.1.0-draft` has fixed order:
 
-The architecture is a linear CPU float64 scorer, using PyTorch already pinned
-by PR #17. No new runtime dependency is introduced. Training fits per-feature
-mean and population standard deviation using **all supplied training candidates
-only**; constant features receive scale 1. Validation is not accepted by
-`fit` and inference never updates preprocessing.
+- **Basic (5):** `bert_start_logit`, `bert_end_logit`, `span_token_count`,
+  `answer_has_digit`, `answer_initial_upper`.
+- **Full (15):** basic, then `q_who`, `q_what`, `q_when`, `q_where`, `q_why`,
+  `q_how`, `q_which`, `q_other`, `when_digit_match`, `who_initial_upper_match`.
 
-Let z be standardized features. Within each informative training question,
-subtract that question's mean feature vector and mean target. Minimize:
+Digit and uppercase checks use ASCII; uppercase refers to the first ASCII letter.
+Question type is the first ASCII alphabetic token after leading whitespace, otherwise
+`other`. Interactions multiply `q_when` by the digit flag and `q_who` by the uppercase
+flag. Basic excludes all question-type features. The eight raw type indicators are
+constant within each question and cancel in this centered linear objective.
 
-`mean_over_informative_questions(mean_over_candidates((centered_z @ w -
-centered_target)^2)) + alpha * ||w||^2`
+Targets are separate candidate F1 values in [0,1], generated only from training golds
+by the pinned repository scorer. It takes the maximum over nonempty normalized golds,
+using an empty-string fallback if none remain. Golds and targets never become features.
+The core fits training-only means and population standard deviations (constant scale 1),
+then float64 ridge on within-question-centered features and targets, equally weighting
+informative questions. Scores are ranking values, not probabilities; exact ties choose
+first candidate. Singleton/all-equal groups remain in scaling and coverage but not
+ranking loss. A wholly uninformative batch fails; the real runner has no silent fallback.
 
-The default positive ridge penalty is `alpha=1`; it is configurable. The solver
-uses a CPU SVD of the weighted, centered design, avoiding the loss of small
-penalties when forming normal equations for correlated features. Singular values
-at or below `float64_epsilon * max(design.shape) * largest_singular_value` are
-treated as numerical null directions. Ridge shrinkage is applied to the remaining
-directions using `hypot(singular_value, sqrt(alpha))` to avoid underflow when
-squaring tiny singular values. Signals below the numerical rank tolerance cannot
-be recovered by choosing an arbitrarily small penalty. Nonfinite preprocessing and solver failures
-raise `ValueError` without replacing a previously fitted model. This
-centered least-squares objective focuses on relative candidate quality and gives
-each informative question equal total loss weight despite variable shortlist
-lengths. It is a provisional choice, not an agreed team objective or a claim
-of validation-selected hyperparameters. Inference scores are uncalibrated ranking
-values, not probabilities. There is no intercept because it cannot change rank.
+## Manifest and execution
 
-Single-candidate questions and questions whose targets are all equal (zero or
-nonzero) do not contribute ranking loss. They still contribute to train-only
-scaling. If **all** training questions lack target variation, fit fails by
-default. Explicit `no_signal="first"` creates a zero-weight fallback and records
-zero informative questions. If features cannot distinguish candidates despite
-varying targets, the ridge solution may also tie. All exact score ties always
-select the first candidate in the supplied order. There is no gold-based
-fallback, answer synthesis, or abstention. The adapter must provide a stable
-order (e.g. its existing baseline order) to make ties reproducible.
+Copy [`configs/reranker-real.example.json`](../configs/reranker-real.example.json)
+to an untracked run manifest and fill its unresolved values. Paths resolve relative
+to that manifest. The unchanged template intentionally fails validation.
+Top-level fields are `schema`, `status`, `policy`, `inputs`, `scorer`, `lineage`
+and `baseline_generation`; real runs use status `real_provisional`.
 
-`select` returns one of the supplied Candidate objects for each question;
-`predict` returns exactly `{question_id: answer_text}`, the intended supplied
-SQuAD-scorer prediction mapping. Empty question batches, zero-candidate questions,
-duplicate IDs, malformed records and incomplete labels fail explicitly rather
-than silently dropping questions. `save_predictions` writes UTF-8 JSON.
+`policy` fixes the ordered registry, target, `no_signal="error"`, and 1–10 distinct
+positive `alphas`. Keep its required `id`, `decision_reference`, `acceptance` and
+`selection` fields; they describe the run configuration, not team agreement.
+For each variant, the runner selects highest internal-val F1, then EM, then first
+configured alpha. Use a predeclared grid.
+The checked run used `[1.0]`. Freeze settings before any official-dev comparison.
+`scorer.hashes` pins both `evaluate-v2.0.py` and `scripts/squad_eval.py`; the
+repository implementation is available, but course-source equivalence is unverified.
 
-## Persistence and local CLI
+**Strict provenance is the default.** Fill the template's hashed checkpoint/tokenizer
+file descriptors and `run_info`, `train_log`, `environment`, relationship reference
+and matching checkpoint/generation declarations. Hash checks do not load weights.
 
-`save` / `Reranker.load` round-trip weights, preprocessing mean/scale, ordered
-feature groups, alpha, no-signal policy, objective/version and training counts in
-a single plain JSON file. Loading validates fields, dimensions, finite numbers,
-positive scales and counts. It does not deserialize executable pickle objects.
-Use the same feature semantics at prediction time; a JSON model cannot verify
-upstream feature provenance or units.
+**Explicit provisional mode** requires both the flag below and a different lineage
+object: schema `cs4248.provisional-provenance/0.1.0-draft`, status
+`provisional_team_declarations_unverified`, `approval_reference`, `evidence_references`,
+`checkpoint_export_value`, hashed `archives` for data/checkpoint/candidates,
+`original_records` marking run_info/train_log/environment `unavailable`, and `unverified`
+marking training lineage/environment, base-model/tokenizer revisions and independent
+baseline execution `unverified`. Replace `baseline_generation` with status
+`supplied_predictions_execution_unverified`, `declared_settings`, `unverified_fields`
+and `evidence_references`. Unknown fields must be the ordered complement of known
+settings in `BASELINE_FIELDS`; declared settings must match the export exactly.
+See the [schema checks](../reranker/real_training.py) and
+[fixture construction](../tests/test_real_training.py) for exact keys. Do not invent logs.
 
-The optional CLI's JSON records are only an example **local adapter format**.
-Replace `questions_from_records` at the integration boundary when #9 settles its
-interface. It intentionally rejects extra question/candidate record fields, so
-target annotations cannot silently enter via those records.
-
-Example questions file:
-
-```json
-[
-  {"question_id": "demo", "candidates": [
-    {"candidate_id": "a", "answer": "first", "features": {"score": 0, "type_match": 0}},
-    {"candidate_id": "b", "answer": "second", "features": {"score": 1, "type_match": 1}}
-  ]}
-]
-```
-
-A separate targets file contains `{"demo": {"a": 0, "b": 1}}`. A features
-file contains `{"basic": ["score"], "compatibility": ["type_match"], "group": "basic"}`;
-set group to `"full"` for the full variant. These are synthetic examples.
-
-From the repository root in the pinned environment:
+Run inside an appropriately sized CPU allocation from the repository root:
 
 ```bash
-python -m reranker train --questions train.json --targets targets.json \
-  --features features.json --model checkpoints/reranker-basic.json
-python -m reranker predict --questions validation-inputs.json \
-  --model checkpoints/reranker-basic.json --output outputs/predictions-basic.json
-OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 CUDA_VISIBLE_DEVICES="" \
-  python -m unittest discover -s tests -p test_reranker.py -v
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export CUDA_VISIBLE_DEVICES="" PYTHONDONTWRITEBYTECODE=1
+python -m reranker.real_training --manifest run-manifest.json --output outputs/reranker
+# For an explicit provisional manifest, add: --allow-provisional-provenance
 ```
 
-These CLI examples demonstrate the generic core interface; they do not establish
-real-data feature, target or provenance approval. Use the active adapter described
-in [the current status](reranker-status.md) for PR28 exports. Fit preprocessing
-only on reranker-training inputs, keep validation labels out of fitting, and
-freeze settings before final comparisons. Team documentation already reports
-baseline official-dev results; official dev must not be described as untouched.
-The core alone cannot establish split membership or upstream provenance.
+The output directory must be new, with an existing parent. Inputs are not rewritten.
+The CLI does not allocate compute or enforce resource limits; decoded exports can
+occupy several GiB. The recorded alpha-1 run peaked at about 3.1 GiB resident memory.
 
-## Review and next integration step
+## Outputs and reload
 
-Synthetic tests verify both variants, variable counts, compatibility exclusion,
-constant features, no validation-statistic mutation, deterministic ties,
-save/reload equivalence, malformed/missing inputs, no-signal fallback and
-separation of labels from inference inputs. See `reranker-validation.md` for
-the actual environment, commands, independent review and outcomes.
+A successful run writes `complete.json`: baseline/basic/full EM/F1, trial results,
+selected alphas, hashes and provenance. Other outputs are `manifest.json`, separate
+`targets.json`, derived training first answers, baseline predictions and each variant's
+`*-model.json`, `*-binding.json`, `*-predictions.json`. Missing `complete.json` means
+an incomplete run; keep partial outputs for diagnosis and use a new output directory.
 
-Before real training, agree with #9 on target definition, all-tied/no-useful
-candidate policy, the adapter and feature-group lists; then connect a small
-real labelled fixture from the approved reranker-training split and its separate
-internal-validation inputs. Coordinate the output contract with the evaluator
-owner. Do not claim an accuracy gain from these synthetic software checks.
+Reload takes label-free candidate bytes and an independently retained binding hash:
 
-This implementation and tests were generated with OpenAI Codex assistance and
-independently reviewed by a second Codex agent. No external source code was
-copied; PyTorch supplies tensor operations and the ridge linear solver.
+```python
+from pathlib import Path
+from reranker.real_training import reload_predict
+
+answers, scores = reload_predict(
+    Path("outputs/reranker"), "basic", trusted_binding_sha256,
+    Path("new_internal_val_candidates.json").read_bytes(),
+    allow_provisional_provenance=True,  # only for an explicit provisional binding
+)
+```
+
+`answers` maps every question ID to its exact supplied text. Reload never fits or
+updates preprocessing. It checks model/source hashes, feature identity/order, generation
+settings, internal_val role and BERT/reranker-training exclusions. New compatible
+batches need not match old validation bytes. A hash inside its own artifact is not
+an independent trust anchor. The real runner has no official-dev inference path.
+
+## Tests and current result
+
+Run each suite in a fresh process; the offline contract tests check that model modules
+were not imported. These commands use fixtures, not release downloads or BERT inference:
+
+```bash
+for suite in test_reranker.py test_team_candidates.py test_team_model.py \
+  test_real_training.py test_offline_handoff_contract.py test_handoff_integration.py \
+  test_heldout_inference.py test_evaluator_boundary.py; do
+  python -m unittest discover -s tests -p "$suite" -v || exit 1
+done
+```
+
+The published provisional alpha-1 run passed 18 focused real-training tests and
+exact model reload checks. On all 9,131 internal-validation questions:
+
+| System | EM (%) | F1 (%) |
+| --- | ---: | ---: |
+| Supplied BERT baseline | 65.403570 | 79.287794 |
+| Basic, alpha 1 | 63.925090 | 76.781898 |
+| Full, alpha 1 | 63.892235 | 76.772235 |
+
+Neither variant beat baseline. Basic corrected 339 EM errors but broke 474; full
+corrected 337 but broke 475. These are provisional results, not an accuracy gain.
+Original BERT training/baseline execution, exact upstream revisions/environment and
+course-scorer identity remain unverified. Internal validation was used upstream for
+BERT validation, so it is not untouched. Hashes establish byte identity, not origin;
+exact-context checks do not detect paraphrases. Features and target policies remain
+provisional rather than team-agreed. No reranker official-dev result is claimed.
+
+## Other APIs and contribution
+
+`Reranker` is the generic numerical core; it does not enforce split provenance.
+`TeamCandidateModel.fit_synthetic` remains synthetic-only. `SyntheticRun` replays the
+older draft bundles; `HeldoutRun` accepts new label-free synthetic bundles. These
+are compatibility/test APIs, not substitutes for the real-label runner above.
+See their source in [`reranker/`](../reranker/) and [`offline_handoff/`](../offline_handoff/).
+
+Xu An's reranker contribution covers the stable ridge core, candidate validation,
+basic/full feature separation, real-label integration, persistence and validation,
+building on Hai's pipeline/evaluator and Sean's exporter. Codex generated and edited
+implementation, tests and text, and assisted technical review. Xu An directed the
+project work; report contributions and AI use should be reviewed and attributed accurately.
