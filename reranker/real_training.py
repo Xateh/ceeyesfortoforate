@@ -95,7 +95,11 @@ def validate_inputs(blobs, policy):
         c.require(set(batch['audit']['membership']['questions']) == set(index), 'candidate/split coverage mismatch')
         for q in batch['audit']['retained_origins']:
             item = index[q['question_id']]
-            c.require(all(q[k] == item[k] for k in ('article_id', 'context', 'question')), 'candidate/source identity mismatch')
+            c.require(all(q[k] == item[k] for k in ('article_id', 'context')), 'candidate/source identity mismatch')
+            # PR28 exports preprocessing's question.strip(); raw source/split
+            # identity above, context, gold offsets and answer text stay exact.
+            c.require(q['question'] == item['question'].strip(),
+                      'candidate/source question preprocessing mismatch')
     baseline = c.decode(blobs['validation_baseline'])
     team.adapt_export(blobs['validation_candidates'], group='basic', baseline=baseline)
     return splits, training, validation, baseline
@@ -111,7 +115,60 @@ def checked_file(entry, base):
     return path
 
 
-def load_manifest(path):
+PROVISIONAL = 'provisional_team_declarations_unverified'
+PROVENANCE_SCHEMA = 'cs4248.provisional-provenance/0.1.0-draft'
+BASELINE_FIELDS = (*GENERATION, 'batch_size')
+UNVERIFIED = ('training_lineage', 'training_environment', 'base_model_revision',
+              'tokenizer_revision', 'independent_baseline_execution')
+
+
+def references(values):
+    c.require(type(values) is list and values, 'evidence references required')
+    for value in values:
+        c.text(value, 'evidence reference', True)
+        c.require(bool(value.strip()), 'empty evidence reference')
+
+
+def provisional_lineage_check(lineage, base=None):
+    c.keys(lineage, ('schema', 'status', 'approval_reference', 'evidence_references',
+                    'checkpoint_export_value', 'archives', 'original_records', 'unverified'), 'provisional lineage')
+    c.require(lineage['schema'] == PROVENANCE_SCHEMA and lineage['status'] == PROVISIONAL,
+              'provisional lineage schema/status required')
+    for key in ('approval_reference', 'checkpoint_export_value'):
+        c.text(lineage[key], key, True); c.require(bool(lineage[key].strip()), 'empty provenance declaration')
+    references(lineage['evidence_references'])
+    c.require(lineage['original_records'] == {k: 'unavailable' for k in ('run_info', 'train_log', 'environment')},
+              'original records must be explicitly unavailable')
+    c.require(lineage['unverified'] == {k: 'unverified' for k in UNVERIFIED},
+              'all provisional uncertainties must remain explicit')
+    c.keys(lineage['archives'], ('data', 'checkpoint', 'candidates'), 'release archive identities')
+    for entry in lineage['archives'].values():
+        c.keys(entry, ('path', 'sha256'), 'archive descriptor'); digest(entry['sha256'])
+        c.text(entry['path'], 'archive path', True)
+        if base is not None: checked_file(entry, base)
+
+
+def provisional_baseline_check(value, metadata=None):
+    c.keys(value, ('status', 'declared_settings', 'unverified_fields', 'evidence_references'), 'provisional baseline')
+    c.require(value['status'] == 'supplied_predictions_execution_unverified', 'baseline execution must remain unverified')
+    references(value['evidence_references'])
+    settings = value['declared_settings']
+    c.require(type(settings) is dict and settings and set(settings) <= set(BASELINE_FIELDS),
+              'known partial baseline settings required')
+    c.require(value['unverified_fields'] == [k for k in BASELINE_FIELDS if k not in settings],
+              'exact ordered unknown baseline fields required')
+    for key, supplied in settings.items():
+        if key in ('max_answer_length', 'n_best', 'max_candidates', 'batch_size'):
+            c.integer(supplied, key, 1)
+        elif key == 'max_context_only': c.require(type(supplied) is bool, 'baseline boolean required')
+        else: c.text(supplied, key, True)
+        if metadata is not None:
+            expected = metadata[key]
+            c.require(type(supplied) is type(expected) and supplied == expected,
+                      'baseline generation mismatch: ' + key)
+
+
+def load_manifest(path, *, allow_provisional_provenance=False):
     path = Path(path); manifest = c.decode(path.read_bytes())
     c.keys(manifest, ('schema', 'status', 'policy', 'inputs', 'scorer', 'lineage', 'baseline_generation'), 'run manifest')
     c.require(manifest['schema'] == SCHEMA, 'run schema mismatch')
@@ -122,24 +179,33 @@ def load_manifest(path):
         raw = checked_file(entry, path.parent).read_bytes()
         c.require(c.sha256(raw) == entry['sha256'], 'input changed while reading')
         blobs[key] = raw
-    c.keys(manifest['baseline_generation'], GENERATION, 'baseline declared generation')
-    validation_metadata = c.decode(blobs['validation_candidates'])['metadata']
-    for key in GENERATION:
-        supplied, expected = manifest['baseline_generation'][key], validation_metadata[key]
-        c.require(type(supplied) is type(expected) and supplied == expected, 'baseline generation mismatch: ' + key)
     lineage = manifest['lineage']
-    if manifest['status'] == 'synthetic_fixture':
-        c.require(lineage == {'status': 'synthetic_no_checkpoint'}, 'synthetic lineage required')
+    c.require(type(lineage) is dict, 'lineage mapping required')
+    provisional = lineage.get('status') == PROVISIONAL
+    validation_metadata = c.decode(blobs['validation_candidates'])['metadata']
+    if provisional:
+        c.require(allow_provisional_provenance is True and manifest['status'] == 'real_provisional',
+                  'explicit provisional provenance opt-in required for real data')
+        provisional_lineage_check(lineage, path.parent)
+        provisional_baseline_check(manifest['baseline_generation'], validation_metadata)
     else:
-        c.keys(lineage, ('status', 'relationship_reference', 'checkpoint_export_value',
-                        'checkpoint_files', 'tokenizer_files', 'run_info', 'train_log', 'environment'), 'real lineage')
-        c.require(lineage['status'] == 'caller_attested_lineage_not_origin_authentication', 'real lineage attestation required')
-        for key in ('relationship_reference', 'checkpoint_export_value'):
-            c.text(lineage[key], key, True); c.require(bool(lineage[key].strip()), 'unresolved lineage')
-        for group in ('checkpoint_files', 'tokenizer_files'):
-            c.require(type(lineage[group]) is dict and lineage[group], 'lineage files required')
-            for entry in lineage[group].values(): checked_file(entry, path.parent)
-        for key in ('run_info', 'train_log', 'environment'): checked_file(lineage[key], path.parent)
+        c.keys(manifest['baseline_generation'], GENERATION, 'baseline declared generation')
+        for key in GENERATION:
+            supplied, expected = manifest['baseline_generation'][key], validation_metadata[key]
+            c.require(type(supplied) is type(expected) and supplied == expected, 'baseline generation mismatch: ' + key)
+        if manifest['status'] == 'synthetic_fixture':
+            c.require(lineage == {'status': 'synthetic_no_checkpoint'}, 'synthetic lineage required')
+        else:
+            c.keys(lineage, ('status', 'relationship_reference', 'checkpoint_export_value',
+                            'checkpoint_files', 'tokenizer_files', 'run_info', 'train_log', 'environment'), 'real lineage')
+            c.require(lineage['status'] == 'caller_attested_lineage_not_origin_authentication', 'real lineage attestation required')
+            for key in ('relationship_reference', 'checkpoint_export_value'):
+                c.text(lineage[key], key, True); c.require(bool(lineage[key].strip()), 'unresolved lineage')
+            for group in ('checkpoint_files', 'tokenizer_files'):
+                c.require(type(lineage[group]) is dict and lineage[group], 'lineage files required')
+                for entry in lineage[group].values(): checked_file(entry, path.parent)
+            for key in ('run_info', 'train_log', 'environment'): checked_file(lineage[key], path.parent)
+    if manifest['status'] != 'synthetic_fixture':
         for key in ('train_candidates', 'validation_candidates'):
             c.require(c.decode(blobs[key])['metadata']['checkpoint'] == lineage['checkpoint_export_value'], 'checkpoint declaration mismatch')
     c.keys(manifest['scorer'], ('source_status', 'source_reference', 'hashes'), 'scorer identity')
@@ -188,16 +254,24 @@ def state_bytes(model):
         return path.read_bytes()
 
 
-def reload_predict(directory, group, expected_binding_sha256, candidate_bytes):
+def reload_predict(directory, group, expected_binding_sha256, candidate_bytes, *, allow_provisional_provenance=False):
     """Label-free new batches; an external binding pin is mandatory, never fit."""
     c.require(group in ('basic', 'full'), 'feature group required'); digest(expected_binding_sha256)
     directory = Path(directory); raw = (directory / (group + '-binding.json')).read_bytes()
     c.require(c.sha256(raw) == expected_binding_sha256, 'binding hash mismatch')
     binding = c.decode(raw)
+    lineage = binding.get('lineage') if type(binding) is dict else None
+    provisional = type(lineage) is dict and lineage.get('status') == PROVISIONAL
+    extra = ('provisional_baseline_generation',) if provisional else ()
     c.keys(binding, ('schema', 'status', 'profile', 'producer_ref', 'features', 'alpha', 'policy',
                      'generation', 'exclusions', 'inputs_sha256', 'targets_sha256', 'scorer',
-                     'lineage', 'model_sha256', 'software_sha256'), 'model binding')
+                     'lineage', 'model_sha256', 'software_sha256') + extra, 'model binding')
     c.require(binding['schema'] == BINDING and binding['status'] in ('synthetic_fixture', 'real_provisional'), 'model schema/status')
+    if provisional:
+        c.require(allow_provisional_provenance is True and binding['status'] == 'real_provisional',
+                  'explicit provisional provenance opt-in required for reload')
+        provisional_lineage_check(lineage)
+        provisional_baseline_check(binding['provisional_baseline_generation'])
     c.require(binding['profile'] == team.PROFILE and binding['producer_ref'] == team.PRODUCER_REF, 'adapter version mismatch')
     policy_check(binding['policy']); c.require(binding['features'] == c.feature_config(group), 'feature mismatch')
     c.number(binding['alpha'], 'selected alpha')
@@ -209,6 +283,15 @@ def reload_predict(directory, group, expected_binding_sha256, candidate_bytes):
     for name, expected in binding['software_sha256'].items():
         digest(expected); c.require(c.sha256((ROOT / name).read_bytes()) == expected, 'software identity mismatch')
     c.keys(binding['generation'], GENERATION, 'generation identity')
+    if provisional:
+        c.require(lineage['checkpoint_export_value'] == binding['generation']['checkpoint'],
+                  'saved provisional checkpoint mismatch')
+        for key, supplied in binding['provisional_baseline_generation']['declared_settings'].items():
+            if key in GENERATION:
+                expected = binding['generation'][key]
+                c.require(type(supplied) is type(expected) and supplied == expected,
+                          'saved provisional baseline generation mismatch: ' + key)
+
     c.keys(binding['exclusions'], ('questions', 'articles', 'context_hashes'), 'training exclusions')
     batch = team.adapt_export(candidate_bytes, group=group)
     c.require(batch['audit']['metadata']['split'] == 'internal_val', 'inference role forbidden')
@@ -229,8 +312,9 @@ def reload_predict(directory, group, expected_binding_sha256, candidate_bytes):
     return predictions, model.scores(questions)
 
 
-def run(manifest_path, output):
-    start = time.monotonic(); manifest, blobs = load_manifest(manifest_path)
+def run(manifest_path, output, *, allow_provisional_provenance=False):
+    start = time.monotonic(); manifest, blobs = load_manifest(manifest_path, allow_provisional_provenance=allow_provisional_provenance)
+    provisional = manifest['lineage'].get('status') == PROVISIONAL
     policy = manifest['policy']; splits, training, validation, baseline = validate_inputs(blobs, policy)
     evaluate = load_scorer()
     targets = targets_from_training(evaluate, splits['reranker_train'][0], training['questions'])
@@ -243,11 +327,13 @@ def run(manifest_path, output):
     save('baseline-predictions.json', baseline)
     baseline_metrics = score(evaluate, splits['internal_val'][0], baseline)
     report = {'schema': SCHEMA, 'status': manifest['status'], 'policy': policy,
+              'provenance_mode': 'explicit_provisional' if provisional else 'strict_or_synthetic',
               'origin_authenticated': False, 'course_scorer_origin_verified': False,
               'scorer': manifest['scorer'], 'lineage': manifest['lineage'],
               'training_baseline_status': 'derived_first_candidates_not_independent_baseline',
               'baseline_generation': manifest['baseline_generation'],
-              'baseline_parity_scope': 'declared_settings_and_exact_first_answers_not_run_authentication',
+              'baseline_parity_scope': ('partial_team_declarations_and_exact_first_answers_execution_unverified' if provisional
+                                        else 'declared_settings_and_exact_first_answers_not_run_authentication'),
               'input_sha256': {k: c.sha256(v) for k, v in blobs.items()},
               'split_counts': {role: len(value[1]) for role, value in splits.items()},
               'baseline': baseline_metrics, 'variants': {}}
@@ -276,8 +362,10 @@ def run(manifest_path, output):
                    'targets_sha256': c.sha256(c.encode(targets)), 'scorer': manifest['scorer'],
                    'lineage': manifest['lineage'], 'model_sha256': c.sha256(model_raw),
                    'software_sha256': {name: c.sha256((ROOT / name).read_bytes()) for name in SOFTWARE_FILES}}
+        if provisional: binding['provisional_baseline_generation'] = manifest['baseline_generation']
         save(group + '-binding.json', binding); pin = c.sha256(c.encode(binding))
-        reloaded_predictions, reloaded_scores = reload_predict(output, group, pin, blobs['validation_candidates'])
+        reloaded_predictions, reloaded_scores = reload_predict(output, group, pin, blobs['validation_candidates'],
+                                                                allow_provisional_provenance=allow_provisional_provenance)
         c.require(predictions == reloaded_predictions and scores == reloaded_scores, 'reload equivalence failed')
         save(group + '-predictions.json', predictions)
         report['variants'][group] = {'selected_alpha': alpha, 'trials': trials, 'metrics': metrics,
@@ -293,7 +381,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    args = parser.parse_args(argv); result = run(args.manifest, args.output)
+    parser.add_argument('--allow-provisional-provenance', action='store_true',
+                        help='Explicitly accept recorded missing run records and unverified team declarations.')
+    args = parser.parse_args(argv)
+    result = run(args.manifest, args.output, allow_provisional_provenance=args.allow_provisional_provenance)
     print(json.dumps({'status': result['status'], 'split_counts': result['split_counts'], 'output': str(args.output)}))
 
 

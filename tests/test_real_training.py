@@ -110,6 +110,151 @@ class RealTrainingTests(unittest.TestCase):
                 with self.assertRaises(ValueError): r.validate_inputs(self.blobs(), policy())
                 fit.assert_not_called()
 
+    def test_producer_question_strip_accepts_only_source_boundary(self):
+        pristine = copy.deepcopy(self.values)
+        for prefix, suffix in ((' ', ''), ('', ' '), (' \t', '\n '), ('\u2003', '\u00a0')):
+            self.values = copy.deepcopy(pristine)
+            for role, source_pos in (('reranker_train', 1), ('internal_val', 2)):
+                qa = self.values[role]['data'][0]['paragraphs'][0]['qas'][0]
+                qa['question'] = prefix + qa['question'] + suffix
+                self.values['source_train']['data'][source_pos] = copy.deepcopy(self.values[role]['data'][0])
+            before = self.blobs()
+            with self.subTest(prefix=prefix, suffix=suffix), patch.object(Reranker, 'fit') as fit:
+                r.validate_inputs(before, policy())
+                fit.assert_not_called()
+            self.assertEqual(before, self.blobs())
+
+    def test_raw_source_split_question_identity_remains_exact(self):
+        self.values['internal_val']['data'][0]['paragraphs'][0]['qas'][0]['question'] += ' '
+        with self.assertRaisesRegex(ValueError, 'split/source identity'):
+            r.validate_inputs(self.blobs(), policy())
+
+    def test_export_question_is_not_normalized_or_content_changed(self):
+        pristine = copy.deepcopy(self.values)
+        for change in (lambda q: ' ' + q, lambda q: q + ' ',
+                       lambda q: q.replace(' ', '  ', 1), lambda q: q + ' changed'):
+            self.values = copy.deepcopy(pristine)
+            q = self.values['validation_candidates']['questions'][0]
+            q['question'] = change(q['question'])
+            with self.subTest(question=q['question']), self.assertRaisesRegex(ValueError, 'question preprocessing'):
+                r.validate_inputs(self.blobs(), policy())
+
+    def test_question_fix_keeps_article_and_context_identity_exact(self):
+        pristine = copy.deepcopy(self.values)
+        for field in ('article_id', 'context'):
+            self.values = copy.deepcopy(pristine)
+            q = self.values['validation_candidates']['questions'][0]; q[field] += ' '
+            q['context_id'] = c.sha256(json.dumps([q['article_id'], q['context']], ensure_ascii=False).encode())
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'candidate/source identity'):
+                r.validate_inputs(self.blobs(), policy())
+
+    def enable_provisional(self):
+        archive = self.path / 'fixture-archive.bin'
+        archive.write_bytes(b'Invented test bytes, not a team release or run record.')
+        descriptor = {'path': archive.name, 'sha256': c.sha256(archive.read_bytes())}
+        self.manifest['status'] = 'real_provisional'
+        self.manifest['lineage'] = {
+            'schema': r.PROVENANCE_SCHEMA, 'status': r.PROVISIONAL,
+            'approval_reference': 'synthetic test of explicit provisional authorization',
+            'evidence_references': ['synthetic fixture declaration, not production evidence'],
+            'checkpoint_export_value': self.values['train_candidates']['metadata']['checkpoint'],
+            'archives': {k: dict(descriptor) for k in ('data', 'checkpoint', 'candidates')},
+            'original_records': {k: 'unavailable' for k in ('run_info', 'train_log', 'environment')},
+            'unverified': {k: 'unverified' for k in r.UNVERIFIED}}
+        settings = {k: self.values['validation_candidates']['metadata'][k]
+                    for k in ('checkpoint', 'max_answer_length', 'n_best', 'batch_size')}
+        self.manifest['baseline_generation'] = {
+            'status': 'supplied_predictions_execution_unverified', 'declared_settings': settings,
+            'unverified_fields': [k for k in r.BASELINE_FIELDS if k not in settings],
+            'evidence_references': ['synthetic test declaration only']}
+        self.write_manifest()
+
+    def test_provisional_requires_optin_and_persists_uncertainties(self):
+        self.enable_provisional()
+        for optin in (False, 1):
+            with self.assertRaisesRegex(ValueError, 'opt-in'):
+                r.load_manifest(self.manifest_path, allow_provisional_provenance=optin)
+        report = r.run(self.manifest_path, self.path / 'out', allow_provisional_provenance=True)
+        self.assertEqual(report['status'], 'real_provisional')
+        self.assertEqual(report['provenance_mode'], 'explicit_provisional')
+        self.assertFalse(report['origin_authenticated'])
+        for group in ('basic', 'full'):
+            binding = c.decode((self.path / 'out' / (group + '-binding.json')).read_bytes())
+            self.assertEqual(binding['lineage'], self.manifest['lineage'])
+            self.assertEqual(binding['provisional_baseline_generation'], self.manifest['baseline_generation'])
+            pin = report['variants'][group]['binding_sha256']; raw = c.encode(fixture('internal_val', 'unseen'))
+            with self.assertRaisesRegex(ValueError, 'opt-in'):
+                r.reload_predict(self.path / 'out', group, pin, raw)
+            with patch.object(Reranker, 'fit', side_effect=AssertionError('reload must not fit')):
+                pred, _ = r.reload_predict(self.path / 'out', group, pin, raw, allow_provisional_provenance=True)
+            self.assertEqual(set(pred), {'unseen-q'})
+
+    def test_provisional_honesty_settings_and_archive_guards(self):
+        self.enable_provisional(); pristine = copy.deepcopy(self.manifest)
+        for kind in ('record', 'verified', 'unknown', 'extra', 'boolean', 'setting', 'approval', 'archive', 'checkpoint', 'synthetic'):
+            self.manifest = copy.deepcopy(pristine); lineage = self.manifest['lineage']; baseline = self.manifest['baseline_generation']
+            if kind == 'record': lineage['original_records']['run_info'] = {'path': 'invented.json'}
+            elif kind == 'verified': lineage['unverified']['training_lineage'] = 'verified'
+            elif kind == 'unknown': baseline['unverified_fields'].pop()
+            elif kind == 'extra': baseline['declared_settings']['unknown'] = 1
+            elif kind == 'boolean': baseline['declared_settings']['max_answer_length'] = True
+            elif kind == 'setting': baseline['declared_settings']['max_answer_length'] += 1
+            elif kind == 'approval': lineage['approval_reference'] = ' '
+            elif kind == 'archive': lineage['archives']['checkpoint']['sha256'] = '0' * 64
+            elif kind == 'checkpoint': lineage['checkpoint_export_value'] = 'different'
+            else: self.manifest['status'] = 'synthetic_fixture'
+            self.write_manifest()
+            with self.subTest(kind=kind), self.assertRaises(ValueError):
+                r.load_manifest(self.manifest_path, allow_provisional_provenance=True)
+
+    def test_provisional_flag_does_not_weaken_strict_mode(self):
+        self.manifest['status'] = 'real_provisional'; self.write_manifest()
+        for optin in (False, True):
+            with self.subTest(optin=optin), patch.object(Reranker, 'fit') as fit:
+                with self.assertRaises(ValueError):
+                    r.run(self.manifest_path, self.path / 'out', allow_provisional_provenance=optin)
+                fit.assert_not_called()
+        self.assertFalse((self.path / 'out').exists())
+
+    def test_provisional_keeps_input_hash_identity_and_parity_gates(self):
+        self.enable_provisional(); pristine_values = copy.deepcopy(self.values); pristine = copy.deepcopy(self.manifest)
+        for kind in ('hash', 'baseline', 'question', 'gold', 'coverage'):
+            self.values = copy.deepcopy(pristine_values); self.manifest = copy.deepcopy(pristine)
+            if kind == 'baseline': self.values['validation_baseline']['validation-q'] = 'wrong'
+            elif kind == 'question': self.values['validation_candidates']['questions'][0]['question'] += ' changed'
+            elif kind == 'gold': self.values['internal_val']['data'][0]['paragraphs'][0]['qas'][0]['answers'][0]['answer_start'] += 1
+            elif kind == 'coverage': self.values['source_train']['data'].pop()
+            self.refresh()
+            if kind == 'hash': self.manifest['inputs']['train_candidates']['sha256'] = '0' * 64; self.write_manifest()
+            with self.subTest(kind=kind), patch.object(Reranker, 'fit') as fit:
+                with self.assertRaises(ValueError):
+                    r.run(self.manifest_path, self.path / 'out', allow_provisional_provenance=True)
+                fit.assert_not_called()
+            self.assertFalse((self.path / 'out').exists())
+
+    def test_provisional_reload_rejects_relabelled_evidence(self):
+        self.enable_provisional(); r.run(self.manifest_path, self.path / 'out', allow_provisional_provenance=True)
+        path = self.path / 'out/basic-binding.json'; original = path.read_bytes()
+        for kind in ('lineage', 'baseline', 'unknown', 'checkpoint', 'setting'):
+            binding = c.decode(original)
+            if kind == 'lineage': binding['lineage']['unverified']['training_lineage'] = 'verified'
+            elif kind == 'baseline': binding['provisional_baseline_generation']['status'] = 'verified'
+            elif kind == 'checkpoint': binding['lineage']['checkpoint_export_value'] = 'different'
+            elif kind == 'setting': binding['provisional_baseline_generation']['declared_settings']['max_answer_length'] += 1
+            else: binding['provisional_baseline_generation']['unverified_fields'].pop()
+            path.write_bytes(c.encode(binding))
+            with self.subTest(kind=kind), self.assertRaises(ValueError):
+                r.reload_predict(self.path / 'out', 'basic', c.sha256(path.read_bytes()),
+                                 c.encode(fixture('internal_val', 'unseen')), allow_provisional_provenance=True)
+
+    def test_cli_provisional_optin_is_explicit(self):
+        for optin in (False, True):
+            argv = ['--manifest', str(self.manifest_path), '--output', str(self.path / 'out')]
+            if optin: argv.append('--allow-provisional-provenance')
+            with self.subTest(optin=optin), patch.object(r, 'run', return_value={'status':'test','split_counts':{}}) as run:
+                r.main(argv)
+                self.assertIs(run.call_args.kwargs['allow_provisional_provenance'], optin)
+
     def test_manifest_hash_policy_scorer_and_real_lineage_fail_closed(self):
         with self.assertRaises(ValueError): r.load_manifest(r.ROOT / 'configs/reranker-real.example.json')
         original = copy.deepcopy(self.manifest)
