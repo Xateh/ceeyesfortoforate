@@ -1,5 +1,8 @@
 # Candidate generation (issue #7)
 
+For gold-aware analysis of the exported internal-validation lists, see the
+[candidate oracle diagnostic](candidate-oracle.md).
+
 Run from the repository root after preprocessing and BERT training:
 
 ```bash
