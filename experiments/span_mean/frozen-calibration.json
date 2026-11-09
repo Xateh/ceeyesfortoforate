@@ -1,0 +1,56 @@
+{
+  "gap_correction": {
+    "features": [
+      "bert_gap",
+      "correction"
+    ],
+    "mean": [
+      2.261933371474482,
+      -0.0009749826193264506
+    ],
+    "scale": [
+      2.0059641417091916,
+      0.006809795369993551
+    ],
+    "coef": [
+      -1.4640822174189307,
+      0.36427499167804095
+    ],
+    "intercept": -1.65901768417853,
+    "classes": [
+      false,
+      true
+    ],
+    "informative_pairs": 8751,
+    "n_iter": [
+      7
+    ],
+    "C": 1,
+    "max_iter": 1000
+  },
+  "gap_only": {
+    "features": [
+      "bert_gap"
+    ],
+    "mean": [
+      2.261933371474482
+    ],
+    "scale": [
+      2.0059641417091916
+    ],
+    "coef": [
+      -1.477070860309665
+    ],
+    "intercept": -1.6436081684113129,
+    "classes": [
+      false,
+      true
+    ],
+    "informative_pairs": 8751,
+    "n_iter": [
+      6
+    ],
+    "C": 1,
+    "max_iter": 1000
+  }
+}
