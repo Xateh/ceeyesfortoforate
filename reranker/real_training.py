@@ -12,6 +12,7 @@ from offline_handoff import contract as c
 from . import team_candidates as team
 from .core import FeatureConfig, Reranker, questions_from_records
 from .team_model import GENERATION
+from .reload_compatibility import compatible_reload_source
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = 'cs4248.real-reranker-run/0.1.0-draft'
@@ -281,7 +282,9 @@ def reload_predict(directory, group, expected_binding_sha256, candidate_bytes, *
     digest(binding['targets_sha256'])
     c.keys(binding['software_sha256'], SOFTWARE_FILES, 'software identity')
     for name, expected in binding['software_sha256'].items():
-        digest(expected); c.require(c.sha256((ROOT / name).read_bytes()) == expected, 'software identity mismatch')
+        digest(expected)
+        actual = c.sha256((ROOT / name).read_bytes())
+        c.require(actual == expected or compatible_reload_source(name, expected, actual), 'software identity mismatch')
     c.keys(binding['generation'], GENERATION, 'generation identity')
     if provisional:
         c.require(lineage['checkpoint_export_value'] == binding['generation']['checkpoint'],
@@ -308,9 +311,13 @@ def reload_predict(directory, group, expected_binding_sha256, candidate_bytes, *
     config = binding['features']
     c.require(model.features.to_dict() == {k: config[k] for k in ('basic', 'compatibility', 'group')}, 'core feature configuration mismatch')
     c.require(model.alpha == binding['alpha'] and model.no_signal == 'error', 'core policy mismatch')
+    # Artifact identity above remains byte-exact; mutation uses the running platform
+    # for both snapshots, so loading an unchanged CRLF artifact on Linux is valid.
+    before = state_bytes(model)
     questions = questions_from_records(batch['questions']); predictions = model.predict(questions)
-    c.require(state_bytes(model) == model_raw, 'inference changed serialized state')
-    return predictions, model.scores(questions)
+    scores = model.scores(questions)
+    c.require(state_bytes(model) == before, 'inference changed serialized state')
+    return predictions, scores
 
 
 def run(manifest_path, output, *, allow_provisional_provenance=False):

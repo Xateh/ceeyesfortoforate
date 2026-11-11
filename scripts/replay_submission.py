@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import platform
 from pathlib import Path
 import subprocess
 import sys
@@ -12,6 +13,7 @@ def read(p): return json.loads(Path(p).read_bytes())
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--main-only',action='store_true',help='Replay only BERT/basic/full on both splits; no fitting or ancillary experiments')
     args=parser.parse_args(); args.output.mkdir(parents=True,exist_ok=False)
     root=args.output
     env=dict(os.environ,OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1',CUDA_VISIBLE_DEVICES='',PYTHONUTF8='1',PYTHONDONTWRITEBYTECODE='1')
@@ -29,6 +31,13 @@ def main():
         for name in ['bert','basic','full']:
             assert read(root/output/(name+'-predictions.json'))==read(Path(original)/(name+'-predictions.json'))
         print(output+' exact prediction parity',flush=True)
+    if args.main_only:
+        checks={'all_passed':True,'mode':'main-only','all_main_prediction_maps_equal':True,
+                'prediction_maps_checked':6,'internal_questions':9131,'dev_questions':10570,
+                'commands':commands,'python':sys.version,'platform':platform.platform(),'cwd':str(Path.cwd())}
+        (root/'checks.json').write_text(json.dumps(checks,indent=2),encoding='utf-8')
+        print(json.dumps(checks,indent=2))
+        return
     run('scripts.reproduce_context_results','--exports','inputs/inference','--splits','data/splits','--scores','inputs/context-scores','--dev-candidates','inputs/official-dev/dev_candidates.json','--dev-gold','data/dev-v1.1.json','--output',root/'context')
     for name in ['gap_correction','gap_only','uncalibrated_span_mean']:
         assert read(root/'context'/(name+'-predictions.json'))==read(Path('results/context')/(name+'-predictions.json'))

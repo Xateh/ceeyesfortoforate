@@ -12,7 +12,7 @@ Extract all desired archives into the **same new directory**. Entries are relati
 
 ## Setup and full verification
 
-Python 3.12.10 on Windows was used; run commands from the extracted root. Create a new environment using the verified Windows commands below.
+Run commands from the extracted root. Windows uses Python 3.12.10; the native Linux checks use Ubuntu under WSL2 with Python 3.12.3. The full Windows environment and main replay commands are:
 
 ```powershell
 python -m venv .venv
@@ -22,17 +22,32 @@ python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/
 python -m pip install -r requirements.txt
 python -m pip check
 python -X utf8 -m scripts.prepare_submission_inputs
-python -X utf8 -m scripts.run_submission_tests --output verification/tests
-python -X utf8 -m scripts.replay_submission --output verification/replay
+python -X utf8 -m scripts.run_submission_tests --output outputs/new-tests
+python -X utf8 -m scripts.replay_submission --main-only --output outputs/new-main-replay
 ```
 
 Main inference, linear fitting and the full results replay need CPU PyTorch in addition to requirements-replay.txt: reranker/core.py imports torch. The full test suite also imports transformers. Replay never loads BERT weights or uses a GPU. Allow roughly 4 GiB RAM for linear fitting; retained tokenized data and optional checkpoints require several GiB disk. Replays require a new output directory on each run. Each test suite uses a separate process as required by the contract import-boundary tests. Avoid Python `-O`, which disables result assertions.
 
-The retained frozen models use Windows CRLF bytes. Their strict reload check compares the saved model with platform-default reserialization, so LF reserialization on Linux/macOS fails that check even when parameters are identical. Windows is the verified target for this frozen handoff; cross-platform serialization needs a separately validated change before claiming Linux/macOS replay support. Do not change artifact bytes or bypass their hash checks. The original ZIPs remain unchanged; this review clarification corrects their README's minimal-dependency and cross-platform implications.
+For a minimal native Linux main replay (no training, GPU or ancillary experiments), use:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install numpy==2.5.4
+python -X utf8 -m scripts.prepare_submission_inputs
+python -X utf8 -m scripts.replay_submission --main-only --output outputs/new-main-replay
+```
+
+The retained model files and bindings are unchanged, including the model files' CRLF bytes. Reload first checks the exact packaged model SHA-256. It then serializes the loaded state before and after prediction/scoring on the running platform and compares those snapshots. Thus native LF serialization no longer falsely signals mutation. Both altered artifact bytes and genuine in-memory mutation still fail their respective checks. No macOS execution was performed.
+
+The frozen bindings also pin the previous loader source. reranker/reload_compatibility.py admits exactly that old source hash paired with the corrected source hash; all other source hashes and the exact model/binding hashes remain enforced. This narrowly recorded source transition preserves the original fitted artifacts rather than rewriting their bindings.
+
+VERIFIED.md and verification/summary.json describe which platform checks actually ran. Platform test/replay logs are included inside the code ZIP under verification/platform-fix/. Receipts from testing the rebuilt archive itself are supplied alongside the ZIP under verification/archive-replay/. Copy that verification folder with the three archives when handing the package to a teammate.
 
 For Git review, commit 1bb3e15 restores the two model files' exact verified bytes after Git normalized their line endings in 16ccbfb. Parameters, source bindings and reported metrics are unchanged. Large inputs, retained score CSVs, original predictions and generated result maps are supplied in the existing ZIPs rather than Git: extract the code and data ZIPs together for full replay. RESULTS.md and provenance/ contain the tracked result and provenance records.
 
-The replay checks all six main prediction maps against the packaged maps, every exact ID set (9,131 internal / 10,570 dev), target metrics, fixes/breaks, original basic-model parity, course/repository per-question scoring parity, context and no-length predictions, oracle, and the separately labelled gated rule. It writes all commands and receipts. Windows course evaluation uses `-X utf8` because the original course script uses platform-default file decoding. Never edit/normalize pinned source or model bytes without creating new bindings.
+The main-only replay checks all six main prediction maps against the packaged maps, every exact ID set (9,131 internal / 10,570 dev), target metrics, fixes/breaks, original basic-model parity and course/repository per-question scoring parity. It writes all commands and receipts. Omitting --main-only additionally replays the older contextual, no-length, oracle and gated experiments using the full dependencies; those extra experiments were not rerun for this loader fix. Windows course evaluation uses `-X utf8` because the original course script uses platform-default file decoding. Never edit/normalize pinned model bytes or bypass their hashes.
 
 ## Individual all-candidate inference and evaluation
 
@@ -80,4 +95,4 @@ Original five-epoch GPU runners/configs/orders are preserved under originals/con
 
 Authors listed in the report: Feng Jiaqi, Goo Zheng Xien Sean, Leu Tho Anh Duy, Teh Xu An and Trinh Hoang Hai. Preserve the team's actual attribution: Hai's data/BERT/evaluator pipeline; Sean's candidate exporter; Xu An's ridge core, basic/full integration, persistence and validation. The repository and experimental branch history are recorded in provenance/branches.json. Other assignments must be confirmed by the team rather than inferred. Codex assisted implementation, tests, review and documentation, including this packaging pass. Each member must supply/review their own truthful AI-use declaration; a recovered form is included in course/.
 
-This is the code/data handoff, not a finished report, slides, recording or set of declarations. The latest report still has placeholders and lacks the completed main official-dev comparison. No files were uploaded to Canvas, no release published and no remote branch pushed. Older project guides are retained for history; this README and RESULTS.md describe the completed submission replay.
+This is the code/data handoff, not a finished report, slides, recording or set of declarations. The latest report still has placeholders and lacks the completed main official-dev comparison. Code review is in PR #31 on submission-package-20261111. No files were uploaded to Canvas and no release was published. Older project guides and verification history are retained as dated evidence; this README and RESULTS.md describe the current handoff.
