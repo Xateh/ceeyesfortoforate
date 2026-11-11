@@ -1,0 +1,83 @@
+{
+  "scope": "frozen_limited_official_dev_comparison",
+  "freeze_sha256": "b3295d4cde924720064c04d8c96f3373065e0c6141f00125e62c11dce41c541b",
+  "candidates_sha256": "890359581a34c75144531a31e322886b02b059d99a0dc8c8db44742cd61488eb",
+  "generation": {
+    "split": "dev",
+    "checkpoint": "final",
+    "examples_path": "data/dev-v1.1.json",
+    "features_path": "data/tokenized/dev",
+    "max_answer_length": 30,
+    "n_best": 20,
+    "max_candidates": 20,
+    "batch_size": 8,
+    "device": "cpu",
+    "numpy_version": "2.2.6",
+    "torch_version": "2.8.0",
+    "logit_dtype": "float32",
+    "tie_break": "first occurrence in baseline traversal",
+    "max_context_only": false
+  },
+  "results": [
+    {
+      "system": "bert_baseline",
+      "exact": 80.01892147587512,
+      "f1": 87.55321556706046,
+      "total": 10570,
+      "delta_em_vs_bert": 0.0,
+      "delta_f1_vs_bert": 0.0,
+      "em_corrected_vs_bert": 0,
+      "em_broken_vs_bert": 0,
+      "predictions_sha256": "ad9dde1c2e9a866b3bd768e8ec2ad4c6d9e05e6d2120d4e13130785ca6b04219"
+    },
+    {
+      "system": "basic_no_length",
+      "exact": 79.94323557237465,
+      "f1": 87.52432258447826,
+      "total": 10570,
+      "delta_em_vs_bert": -0.07568590350047089,
+      "delta_f1_vs_bert": -0.028892982582206628,
+      "em_corrected_vs_bert": 50,
+      "em_broken_vs_bert": 58,
+      "predictions_sha256": "db1b0e542dc10e4aa406748d5fe0b72d593271db8d90ee81b994f2d4ded1410a"
+    },
+    {
+      "system": "full_no_length",
+      "exact": 79.99053926206244,
+      "f1": 87.52807727549207,
+      "total": 10570,
+      "delta_em_vs_bert": -0.028382213812676582,
+      "delta_f1_vs_bert": -0.0251382915683962,
+      "em_corrected_vs_bert": 50,
+      "em_broken_vs_bert": 53,
+      "predictions_sha256": "700918dff929fcb30801ae3bd3ba0d0df335b8c1d38823c7dfef15c754fd4808"
+    },
+    {
+      "system": "basic_raw_length_matched_alpha",
+      "exact": 80.28382213812678,
+      "f1": 87.19829193928756,
+      "total": 10570,
+      "delta_em_vs_bert": 0.2649006622516623,
+      "delta_f1_vs_bert": -0.3549236277729051,
+      "em_corrected_vs_bert": 301,
+      "em_broken_vs_bert": 273,
+      "predictions_sha256": "cdeeb046377bf20eb5abe3aa5617d548aacfd260b84c5b56df084557d92068ad"
+    }
+  ],
+  "software_sha256": {
+    "reranker/official_dev.py": "651968c57f8b1e915827ffa753450080e7e10c6f9ee73cc66004e450c4604030",
+    "scripts/evaluate_official_dev.py": "a5515f5d72dadac99c26416aae8f91f05bb9987df2996132aa76e42615412ae7",
+    "reranker/core.py": "db30adae47f442d35fda89525fffa5a7f1272362a86be8da5e752903838c4235",
+    "reranker/team_candidates.py": "7b3bc539b45a4bbc46b73766c4eb5fa59b089d48b20f022bb9d00980dab13af5",
+    "scripts/squad_eval.py": "80df866a5788741632fae24207357b4012a34b39189ba9ad82e3790b1af4d961",
+    "evaluate-v2.0.py": "710840ce2c2c61716334c056777032f24660b83eb9869a451036e6a24d8103c4"
+  },
+  "evaluation_history": "BERT official-dev scores already appear in docs/eval.md. This is a frozen limited local comparison, not a claim of a previously untouched dev set.",
+  "checks": {
+    "complete_coverage": true,
+    "source_train_excluded": true,
+    "frozen_model_hashes_match": true,
+    "no_model_state_changed": true,
+    "all_predictions_saved_before_scoring": true
+  }
+}

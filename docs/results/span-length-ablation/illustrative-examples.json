@@ -1,0 +1,221 @@
+{
+  "scope": "First three examples per correction/error group; aggregate counts are in comparison.json.",
+  "examples": {
+    "train20_no_length_eval20": {
+      "corrected": [
+        {
+          "question_id": "56ce0d8662d2951400fa69ec",
+          "question": "What is the name of the woman he had a relationship with from 1837-847?",
+          "golds": [
+            "Maria Wodzińska"
+          ],
+          "with_length": "George Sand",
+          "without_length": "Maria Wodzińska",
+          "old_tokens": 2,
+          "new_tokens": 5
+        },
+        {
+          "question_id": "56cbd4c56d243a140015ed7c",
+          "question": "Whose music did Frédéric admire the most and thus provide influence on his work?",
+          "golds": [
+            "J. S. Bach, Mozart and Schubert"
+          ],
+          "with_length": "Schubert",
+          "without_length": "J. S. Bach, Mozart and Schubert",
+          "old_tokens": 1,
+          "new_tokens": 9
+        },
+        {
+          "question_id": "56ce0f42aab44d1400b88421",
+          "question": "What three composers influenced Chopin's work?",
+          "golds": [
+            "J. S. Bach, Mozart and Schubert"
+          ],
+          "with_length": "Mozart and Schubert",
+          "without_length": "J. S. Bach, Mozart and Schubert",
+          "old_tokens": 3,
+          "new_tokens": 9
+        }
+      ],
+      "broken": [
+        {
+          "question_id": "56cbe1996d243a140015edc3",
+          "question": "Which tsar did Frédéric perform for due to his success in previous concerts?",
+          "golds": [
+            "Alexander I"
+          ],
+          "with_length": "Alexander I",
+          "without_length": "Tsar Alexander I",
+          "old_tokens": 2,
+          "new_tokens": 3
+        },
+        {
+          "question_id": "56cbedde6d243a140015edf2",
+          "question": "What did Frédéric compose after hearing Niccolò Paganini perform on the violin?",
+          "golds": [
+            "Souvenir de Paganini"
+          ],
+          "with_length": "Souvenir de Paganini",
+          "without_length": "a set of variations, Souvenir de Paganini",
+          "old_tokens": 6,
+          "new_tokens": 11
+        },
+        {
+          "question_id": "56cf6d3e4df3c31400b0d781",
+          "question": "When did Chopin reach Paris?",
+          "golds": [
+            "September 1831"
+          ],
+          "with_length": "September 1831",
+          "without_length": "late September 1831",
+          "old_tokens": 2,
+          "new_tokens": 3
+        }
+      ]
+    },
+    "train20_no_length_eval5": {
+      "corrected": [
+        {
+          "question_id": "56ce0d8662d2951400fa69ec",
+          "question": "What is the name of the woman he had a relationship with from 1837-847?",
+          "golds": [
+            "Maria Wodzińska"
+          ],
+          "with_length": "George Sand",
+          "without_length": "Maria Wodzińska",
+          "old_tokens": 2,
+          "new_tokens": 5
+        },
+        {
+          "question_id": "56cbd4c56d243a140015ed7c",
+          "question": "Whose music did Frédéric admire the most and thus provide influence on his work?",
+          "golds": [
+            "J. S. Bach, Mozart and Schubert"
+          ],
+          "with_length": "Schubert",
+          "without_length": "J. S. Bach, Mozart and Schubert",
+          "old_tokens": 1,
+          "new_tokens": 9
+        },
+        {
+          "question_id": "56ce0f42aab44d1400b88421",
+          "question": "What three composers influenced Chopin's work?",
+          "golds": [
+            "J. S. Bach, Mozart and Schubert"
+          ],
+          "with_length": "Mozart and Schubert",
+          "without_length": "J. S. Bach, Mozart and Schubert",
+          "old_tokens": 3,
+          "new_tokens": 9
+        }
+      ],
+      "broken": [
+        {
+          "question_id": "56cbe1996d243a140015edc3",
+          "question": "Which tsar did Frédéric perform for due to his success in previous concerts?",
+          "golds": [
+            "Alexander I"
+          ],
+          "with_length": "Alexander I",
+          "without_length": "Tsar Alexander I",
+          "old_tokens": 2,
+          "new_tokens": 3
+        },
+        {
+          "question_id": "56cbedde6d243a140015edf2",
+          "question": "What did Frédéric compose after hearing Niccolò Paganini perform on the violin?",
+          "golds": [
+            "Souvenir de Paganini"
+          ],
+          "with_length": "Souvenir de Paganini",
+          "without_length": "a set of variations, Souvenir de Paganini",
+          "old_tokens": 6,
+          "new_tokens": 11
+        },
+        {
+          "question_id": "56cf6d3e4df3c31400b0d781",
+          "question": "When did Chopin reach Paris?",
+          "golds": [
+            "September 1831"
+          ],
+          "with_length": "September 1831",
+          "without_length": "late September 1831",
+          "old_tokens": 2,
+          "new_tokens": 3
+        }
+      ]
+    },
+    "train5_no_length_eval5": {
+      "corrected": [
+        {
+          "question_id": "56ce0d8662d2951400fa69ec",
+          "question": "What is the name of the woman he had a relationship with from 1837-847?",
+          "golds": [
+            "Maria Wodzińska"
+          ],
+          "with_length": "George Sand",
+          "without_length": "Maria Wodzińska",
+          "old_tokens": 2,
+          "new_tokens": 5
+        },
+        {
+          "question_id": "56cbd4c56d243a140015ed7c",
+          "question": "Whose music did Frédéric admire the most and thus provide influence on his work?",
+          "golds": [
+            "J. S. Bach, Mozart and Schubert"
+          ],
+          "with_length": "Schubert",
+          "without_length": "J. S. Bach, Mozart and Schubert",
+          "old_tokens": 1,
+          "new_tokens": 9
+        },
+        {
+          "question_id": "56ce0f42aab44d1400b88421",
+          "question": "What three composers influenced Chopin's work?",
+          "golds": [
+            "J. S. Bach, Mozart and Schubert"
+          ],
+          "with_length": "Mozart and Schubert",
+          "without_length": "J. S. Bach, Mozart and Schubert",
+          "old_tokens": 3,
+          "new_tokens": 9
+        }
+      ],
+      "broken": [
+        {
+          "question_id": "56cbe1996d243a140015edc3",
+          "question": "Which tsar did Frédéric perform for due to his success in previous concerts?",
+          "golds": [
+            "Alexander I"
+          ],
+          "with_length": "Alexander I",
+          "without_length": "Tsar Alexander I",
+          "old_tokens": 2,
+          "new_tokens": 3
+        },
+        {
+          "question_id": "56cbedde6d243a140015edf2",
+          "question": "What did Frédéric compose after hearing Niccolò Paganini perform on the violin?",
+          "golds": [
+            "Souvenir de Paganini"
+          ],
+          "with_length": "Souvenir de Paganini",
+          "without_length": "a set of variations, Souvenir de Paganini",
+          "old_tokens": 6,
+          "new_tokens": 11
+        },
+        {
+          "question_id": "56cf6d3e4df3c31400b0d781",
+          "question": "When did Chopin reach Paris?",
+          "golds": [
+            "September 1831"
+          ],
+          "with_length": "September 1831",
+          "without_length": "late September 1831",
+          "old_tokens": 2,
+          "new_tokens": 3
+        }
+      ]
+    }
+  }
+}

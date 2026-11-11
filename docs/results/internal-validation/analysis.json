@@ -1,0 +1,28 @@
+{
+  "highest_em_configuration": {
+    "profile": "basic_log_length",
+    "train_k": 20,
+    "eval_k": 5,
+    "alpha": 0.01,
+    "exact": 65.91830029569599,
+    "f1": 79.09165295500937
+  },
+  "f1_delta_decomposition_pp": {
+    "em_corrected": {
+      "questions": 198,
+      "contribution_pp": 1.1257123569045238
+    },
+    "em_broken": {
+      "questions": 151,
+      "contribution_pp": -0.795504442421538
+    },
+    "both_incorrect": {
+      "questions": 2961,
+      "contribution_pp": -0.5263485192651103
+    },
+    "both_correct": {
+      "questions": 5821,
+      "contribution_pp": 0.0
+    }
+  }
+}

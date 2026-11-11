@@ -1,0 +1,11 @@
+{
+  "systems": 4,
+  "questions_per_system": 10570,
+  "frozen_config_unchanged": true,
+  "all_selected_models_unchanged": true,
+  "all_prediction_hashes_and_IDs_match": true,
+  "CSV_matches_JSON": true,
+  "scoring_reproduced_in_paired_analysis": true,
+  "focused_tests_passed": 6,
+  "span_tests_passed": 10
+}

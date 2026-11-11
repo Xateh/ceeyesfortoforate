@@ -1,0 +1,52 @@
+{
+  "scope": "exploratory_internal_validation_numerical_sweep",
+  "inputs": {
+    "source_train": {
+      "path": "data/train-v1.1.json",
+      "sha256": "3527663986b8295af4f7fcdff1ba1ff3f72d07d61a20f487cb238a6ef92fd955"
+    },
+    "bert_train": {
+      "path": "data/splits/bert_train.json",
+      "sha256": "74b886e46f39783778f8d5ae74a52bd0e368d0788b1a6b6815b2396436604fdd"
+    },
+    "reranker_train": {
+      "path": "data/splits/reranker_train.json",
+      "sha256": "9a823f70987bce784795b753ff52edf45a2abcedf2563aa578a5cd2d4edbcdd9"
+    },
+    "internal_val": {
+      "path": "data/splits/internal_val.json",
+      "sha256": "891b6ec72e1a1281c803ea9476e6bfe6e30c566f3a3737822f8c241adf6e70a3"
+    },
+    "train_candidates": {
+      "path": "inference/reranker_train_candidates.json",
+      "sha256": "0ccb906139375370bcbf07454d574352adef7543ac6f9233ffe4213ab81937e7"
+    },
+    "validation_candidates": {
+      "path": "inference/internal_val_candidates.json",
+      "sha256": "f5bf9ede19a39bec33f9c210d1c2ccb5f95338aa2017f5a5fb796e10a0cb7070"
+    },
+    "validation_baseline": {
+      "path": "inference/internal_val_predictions.json",
+      "sha256": "443e21ae40d740160861e2d7f6dab8dff22e01edc6cdb750c5ce973f25c9609b"
+    }
+  },
+  "config_sha256": "498012697d4f90ade2c5d1c5111b2af1d4ee85d2a2b07703479dc377c1425de8",
+  "software_sha256": {
+    "reranker/real_training.py": "e43128f220728ad2e5a53a96b4707e07a962f63074f4daa2ec13ff4a4db74803",
+    "reranker/core.py": "db30adae47f442d35fda89525fffa5a7f1272362a86be8da5e752903838c4235",
+    "reranker/team_candidates.py": "7b3bc539b45a4bbc46b73766c4eb5fa59b089d48b20f022bb9d00980dab13af5",
+    "offline_handoff/contract.py": "d1ad8feaa05c50b58ea41d1e64a27ca0e5689fc510b329eb126be30707c408a6",
+    "evaluate-v2.0.py": "710840ce2c2c61716334c056777032f24660b83eb9869a451036e6a24d8103c4",
+    "scripts/squad_eval.py": "80df866a5788741632fae24207357b4012a34b39189ba9ad82e3790b1af4d961",
+    "scripts/reranker_experiments.py": "f3a93de71c01ab35a929c7862061d0672da7ff51f9d2b2ffdf91e7161c36c0bd"
+  },
+  "python": "3.10.18",
+  "device": "cpu",
+  "torch_threads": 1,
+  "packages": {
+    "torch": "2.8.0",
+    "numpy": "2.2.6"
+  },
+  "target_policy": "repository-scorer-f1-max-normalized-nonempty-golds/1",
+  "selection": "validation_f1_then_em_then_first_alpha"
+}

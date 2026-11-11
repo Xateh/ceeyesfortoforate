@@ -1,0 +1,137 @@
+{
+  "description": "Predeclared exploratory feature and regularization experiments on internal_val; fixed before this sweep.",
+  "alphas": [
+    0.01,
+    0.1,
+    1,
+    10
+  ],
+  "training_top_k": [
+    20,
+    5
+  ],
+  "evaluation_top_k": {
+    "5": [
+      5
+    ],
+    "20": [
+      20,
+      5
+    ]
+  },
+  "selection": "validation_f1_then_em_then_first_alpha",
+  "profiles": [
+    {
+      "id": "basic_raw_length",
+      "basic": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "span_token_count",
+        "answer_has_digit",
+        "answer_initial_upper"
+      ],
+      "compatibility": [],
+      "group": "basic"
+    },
+    {
+      "id": "basic_no_length",
+      "basic": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "answer_has_digit",
+        "answer_initial_upper"
+      ],
+      "compatibility": [],
+      "group": "basic"
+    },
+    {
+      "id": "full_no_length",
+      "basic": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "answer_has_digit",
+        "answer_initial_upper"
+      ],
+      "compatibility": [
+        "q_who",
+        "q_what",
+        "q_when",
+        "q_where",
+        "q_why",
+        "q_how",
+        "q_which",
+        "q_other",
+        "when_digit_match",
+        "who_initial_upper_match"
+      ],
+      "group": "full"
+    },
+    {
+      "id": "basic_log_length",
+      "basic": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "answer_has_digit",
+        "answer_initial_upper",
+        "log_span_tokens"
+      ],
+      "compatibility": [],
+      "group": "basic"
+    },
+    {
+      "id": "basic_length_buckets",
+      "basic": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "answer_has_digit",
+        "answer_initial_upper",
+        "length_bucket_1",
+        "length_bucket_2_3",
+        "length_bucket_4_7",
+        "length_bucket_8_15",
+        "length_bucket_16_plus"
+      ],
+      "compatibility": [],
+      "group": "basic"
+    },
+    {
+      "id": "full_type_log_length",
+      "basic": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "answer_has_digit",
+        "answer_initial_upper"
+      ],
+      "compatibility": [
+        "q_who",
+        "q_what",
+        "q_when",
+        "q_where",
+        "q_why",
+        "q_how",
+        "q_which",
+        "q_other",
+        "when_digit_match",
+        "who_initial_upper_match",
+        "who_log_span_tokens",
+        "what_log_span_tokens",
+        "when_log_span_tokens",
+        "where_log_span_tokens",
+        "why_log_span_tokens",
+        "how_log_span_tokens",
+        "which_log_span_tokens",
+        "other_log_span_tokens"
+      ],
+      "group": "full"
+    },
+    {
+      "id": "logits_only",
+      "basic": [
+        "bert_start_logit",
+        "bert_end_logit"
+      ],
+      "compatibility": [],
+      "group": "basic"
+    }
+  ]
+}

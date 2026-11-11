@@ -55,6 +55,14 @@ checks. On 9,131 internal-validation questions, supplied BERT scored **65.40 EM 
 beat the baseline. The [guide](docs/reranker.md) explains the policy, inputs,
 commands and unresolved provenance; internal validation was also used upstream.
 
+Additional [feature and regularization experiments](docs/reranker-experiments.md)
+record 56 local fits and 84 exploratory internal-validation comparisons, including
+full features without span length, alternative length encodings, and an alpha grid.
+
+The [frozen official-dev comparison](docs/official-dev-evaluation.md) records the
+final BERT/basic/full comparison and a matched-alpha length ablation on all
+10,570 dev questions. The two main selected rerankers did not improve BERT's EM or F1.
+
 Xu An's reranker work builds on Hai's data/BERT/evaluator pipeline and Sean's
 candidate exporter. Implementation, tests, review and documentation used Codex
 assistance. Each member should review and disclose their actual AI use in the report.
