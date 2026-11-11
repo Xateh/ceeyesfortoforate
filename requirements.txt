@@ -1,7 +1,7 @@
 # Install a CPU or CUDA build of PyTorch first (see README).
-torch==2.8.0
-transformers==4.57.1
-datasets==4.3.0
-accelerate==1.10.1
+torch==2.13.0
+transformers==5.10.1
+datasets==5.0.1
+accelerate==1.15.0
 # Keep the filesystem backend compatible with datasets 4.3.0.
-fsspec[http]==2025.9.0
+fsspec[http]==2026.6.0
