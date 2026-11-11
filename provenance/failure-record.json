@@ -1,0 +1,6 @@
+{
+  "initial_internal_val_attempt": "course CLI UnicodeDecodeError under Windows cp1252",
+  "retained_at": "isolated worktree results/internal-val",
+  "resolution": "Run unmodified course scorer via python -X utf8; later original-to-reproduced predictions and metrics all match",
+  "unresolved": "Original calibration bootstrap settings missing; documented interval differs slightly from report"
+}

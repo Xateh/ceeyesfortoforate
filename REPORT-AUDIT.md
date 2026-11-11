@@ -1,0 +1,11 @@
+# Audit of the latest available report
+
+Reviewed local 4248_report (1).zip and 4248_report.pdf, both dated 10 November 2026. Exact original files are retained under originals/report; this is a snapshot, not a claim to have accessed a newer shared draft.
+
+All seven EM/F1 rows in its internal-validation experiment table reproduce to the displayed three decimals: BERT, basic top-20, no-length, CLS epoch 5, span-mean epoch 5, gap-only calibration, and gap-plus-span calibration. Counts of 3 span-mean changes / 1 fix and 344 calibrated changes / 81 fixes / 78 breaks reproduce. The official BERT 80.019/87.553 row reproduces. The no-length F1 recovery is 2.397561 points (2.398 rounded to three decimals; the draft says 2.397, apparently subtracting already-rounded table cells).
+
+The draft's 95% calibration interval [-0.119, +0.221] is not exactly reproduced: explicit article bootstrap, 20,000 draws, seed 4248 gives [-0.119889698, +0.219363223], displayed [-0.120, +0.219]. Original bootstrap code/settings were not found; retain this discrepancy and update the report to the documented interval or supply original resampling evidence. Both intervals include zero. No seed search or tuning was used to force a match.
+
+Human editing remains: replace the placeholder title and template abstract, fill the main-finding TODO, Discussion and Conclusion; add the full-model row and all three final-dev results from RESULTS.md; keep contextual/gated experiments distinct; acknowledge provisional upstream lineage and upstream internal-validation use. The report says the course evaluator was unmodified: the recovered course file is now included unmodified, with scoring parity verified. Review all contributor statements and each member's actual AI-use declaration. The report, slides and recording have not been finalized by this code-package task.
+
+The course requirements PDF asks for a maximum four-page main report plus one reference page, a 15-minute group video with every member speaking, slides, implemented/source supporting code, data and run instructions. It also disallows closed-source LLM/API models in the project. The submitted runtime is BERT/ridge/logistic code and makes no closed-source API calls; members must accurately disclose development assistance and resolve any course-specific declaration question themselves.

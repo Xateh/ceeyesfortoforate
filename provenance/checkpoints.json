@@ -1,0 +1,22 @@
+{
+  "assets/final.zip": {
+    "bytes": 403707864,
+    "sha256": "a8cf3d7fe9ec5fc07a240353d7d858cc8e4c0dac76bbbee57c982852e8601662",
+    "source": "original retained artifact, not regenerated"
+  },
+  "checkpoints/context-pilot/weights.pt": {
+    "bytes": 435651569,
+    "sha256": "64b2b5725953e0a410086239887cf6d03fad787ebe4fcfe48405d16ee79c34ad",
+    "source": "original retained artifact, not regenerated"
+  },
+  "checkpoints/context-cls-epoch5/weights.pt": {
+    "bytes": 435651569,
+    "sha256": "6c6490ba7e322964086e8d48ec752fc7fe98006ccffd8e081a9ccd81af96d2ba",
+    "source": "original retained artifact, not regenerated"
+  },
+  "checkpoints/context-span-mean-epoch5/weights.pt": {
+    "bytes": 435651569,
+    "sha256": "c0b3d4397efe9a40c1c3f6647d296981da90d8432158bc892cfea3b1ad615de9",
+    "source": "original retained artifact, not regenerated"
+  }
+}

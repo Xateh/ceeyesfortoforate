@@ -1,0 +1,60 @@
+{
+  "gap_correction": {
+    "questions": 9131,
+    "changed": 344,
+    "fixed": 81,
+    "broken": 78,
+    "exact": 65.43642536414413,
+    "f1": 79.33903473165341
+  },
+  "gap_only": {
+    "questions": 9131,
+    "changed": 135,
+    "fixed": 26,
+    "broken": 28,
+    "exact": 65.38166684919506,
+    "f1": 79.2857902329951
+  },
+  "uncalibrated_span_mean": {
+    "questions": 9131,
+    "changed": 3,
+    "fixed": 1,
+    "broken": 0,
+    "exact": 65.4145219581645,
+    "f1": 79.2956129225549
+  },
+  "baseline": {
+    "exact": 65.40357025517469,
+    "f1": 79.28779355979084,
+    "total": 9131
+  },
+  "bert_official_dev": {
+    "exact": 80.01892147587512,
+    "f1": 87.5532155670605,
+    "total": 10570
+  },
+  "calibration_mismatches": {},
+  "input_sha256": {
+    "outputs/issue7-validation-20261104/inference/reranker_train_candidates.json": "0ccb906139375370bcbf07454d574352adef7543ac6f9233ffe4213ab81937e7",
+    "outputs/issue7-validation-20261104/inference/internal_val_candidates.json": "f5bf9ede19a39bec33f9c210d1c2ccb5f95338aa2017f5a5fb796e10a0cb7070",
+    "data/splits/reranker_train.json": "9a823f70987bce784795b753ff52edf45a2abcedf2563aa578a5cd2d4edbcdd9",
+    "data/splits/internal_val.json": "891b6ec72e1a1281c803ea9476e6bfe6e30c566f3a3737822f8c241adf6e70a3",
+    "outputs/context-top2-span-mean-epoch5-ranking-diagnostic/reranker_train_scores.csv": "24b3ee6dbb2c836cd78834f361b1c84744d3e7c3120231df2dad2c10cdf3642d",
+    "outputs/context-top2-span-mean-epoch5-ranking-diagnostic/internal_val_scores.csv": "86a6f0c5bf23487958e6b3ee063634fe937200139fab4dabfe0f619cd3479cb4",
+    "outputs/issue7-validation-20261104/inference/internal_val_predictions.json": "443e21ae40d740160861e2d7f6dab8dff22e01edc6cdb750c5ce973f25c9609b",
+    "outputs/official-dev/dev_candidates.json": "46524095a11587a8b10195e6f9131eec81b92d343a683386d81a216d38ac1de9",
+    "data/dev-v1.1.json": "95aa6a52d5d6a735563366753ca50492a658031da74f301ac5238b03966972c9",
+    "evaluate-v2.0.py": "ad2456fd448c298bcd76af64b6d7de2eb84092030db6dcd3b4212f28cbe21c7e",
+    "scripts/squad_eval.py": "3e05fd9576b691ab64a64c011b41612bbe4ecc1bd9b32e42d8af8d84cf7c7438"
+  },
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "versions": {
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.7.2",
+    "torch": "2.8.0+cu128",
+    "transformers": "4.57.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.8.0"
+  }
+}

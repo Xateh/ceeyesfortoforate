@@ -254,7 +254,7 @@ def state_bytes(model):
         return path.read_bytes()
 
 
-def reload_predict(directory, group, expected_binding_sha256, candidate_bytes, *, allow_provisional_provenance=False):
+def reload_predict(directory, group, expected_binding_sha256, candidate_bytes, *, allow_provisional_provenance=False, split='internal_val'):
     """Label-free new batches; an external binding pin is mandatory, never fit."""
     c.require(group in ('basic', 'full'), 'feature group required'); digest(expected_binding_sha256)
     directory = Path(directory); raw = (directory / (group + '-binding.json')).read_bytes()
@@ -293,8 +293,9 @@ def reload_predict(directory, group, expected_binding_sha256, candidate_bytes, *
                           'saved provisional baseline generation mismatch: ' + key)
 
     c.keys(binding['exclusions'], ('questions', 'articles', 'context_hashes'), 'training exclusions')
-    batch = team.adapt_export(candidate_bytes, group=group)
-    c.require(batch['audit']['metadata']['split'] == 'internal_val', 'inference role forbidden')
+    c.require(split in ('internal_val', 'dev'), 'inference role forbidden')
+    batch = team.adapt_export(candidate_bytes, group=group, allow_dev=(split == 'dev'))
+    c.require(batch['audit']['metadata']['split'] == split, 'inference role forbidden')
     for key in GENERATION:
         supplied, expected = batch['audit']['metadata'][key], binding['generation'][key]
         c.require(type(supplied) is type(expected) and supplied == expected, 'generation mismatch: ' + key)
