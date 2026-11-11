@@ -12,7 +12,7 @@ Extract all desired archives into the **same new directory**. Entries are relati
 
 ## Setup and full verification
 
-Python 3.12.10 was used; run commands from the extracted root. Create a new environment (Windows activation shown; on Linux/macOS use `source .venv/bin/activate`).
+Python 3.12.10 on Windows was used; run commands from the extracted root. Create a new environment using the verified Windows commands below.
 
 ```powershell
 python -m venv .venv
@@ -26,7 +26,11 @@ python -X utf8 -m scripts.run_submission_tests --output verification/tests
 python -X utf8 -m scripts.replay_submission --output verification/replay
 ```
 
-On macOS install torch==2.8.0 from the default index instead. Minimal metric replay and linear fitting need only requirements-replay.txt; the full test suite additionally imports torch/transformers. Replay never loads BERT weights or uses a GPU. Allow roughly 4 GiB RAM for linear fitting; retained tokenized data and optional checkpoints require several GiB disk. Replays require a new output directory on each run. Each test suite uses a separate process as required by the contract import-boundary tests. Avoid Python `-O`, which disables result assertions.
+Main inference, linear fitting and the full results replay need CPU PyTorch in addition to requirements-replay.txt: reranker/core.py imports torch. The full test suite also imports transformers. Replay never loads BERT weights or uses a GPU. Allow roughly 4 GiB RAM for linear fitting; retained tokenized data and optional checkpoints require several GiB disk. Replays require a new output directory on each run. Each test suite uses a separate process as required by the contract import-boundary tests. Avoid Python `-O`, which disables result assertions.
+
+The retained frozen models use Windows CRLF bytes. Their strict reload check compares the saved model with platform-default reserialization, so LF reserialization on Linux/macOS fails that check even when parameters are identical. Windows is the verified target for this frozen handoff; cross-platform serialization needs a separately validated change before claiming Linux/macOS replay support. Do not change artifact bytes or bypass their hash checks. The original ZIPs remain unchanged; this review clarification corrects their README's minimal-dependency and cross-platform implications.
+
+For Git review, commit 1bb3e15 restores the two model files' exact verified bytes after Git normalized their line endings in 16ccbfb. Parameters, source bindings and reported metrics are unchanged. Large inputs, retained score CSVs, original predictions and generated result maps are supplied in the existing ZIPs rather than Git: extract the code and data ZIPs together for full replay. RESULTS.md and provenance/ contain the tracked result and provenance records.
 
 The replay checks all six main prediction maps against the packaged maps, every exact ID set (9,131 internal / 10,570 dev), target metrics, fixes/breaks, original basic-model parity, course/repository per-question scoring parity, context and no-length predictions, oracle, and the separately labelled gated rule. It writes all commands and receipts. Windows course evaluation uses `-X utf8` because the original course script uses platform-default file decoding. Never edit/normalize pinned source or model bytes without creating new bindings.
 
