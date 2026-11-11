@@ -1,0 +1,7 @@
+{
+  "origin/main": "ef4a7052f080317f37518517bec90aa52cfe6dfc",
+  "origin/frozen-official-dev-comparison": "9ba7d626c49599fba500bd6b18c8584f76a33bbf",
+  "origin/13-candidate-oracle-diagnostic": "dd1889d19129a3c7a6dfe1a2af5c25cdc493d63c",
+  "origin/reranker-span-length-ablation": "40b9e93d01a2583082cca6d9001727f41be7c504",
+  "origin/context-top2-pilot": "874927f519875509da2b2b4aefea5478586cb011"
+}

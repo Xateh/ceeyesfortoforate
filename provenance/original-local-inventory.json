@@ -1,0 +1,722 @@
+[
+  {
+    "path": "outputs\\environment.txt",
+    "bytes": 1716
+  },
+  {
+    "path": "outputs\\smoke-bert-cpu.json",
+    "bytes": 607
+  },
+  {
+    "path": "outputs\\smoke-bert-gpu.json",
+    "bytes": 630
+  },
+  {
+    "path": "outputs\\smoke-cpu.json",
+    "bytes": 557
+  },
+  {
+    "path": "outputs\\context-reproduction-20261109\\bert_dev_predictions.json",
+    "bytes": 549791
+  },
+  {
+    "path": "outputs\\context-reproduction-20261109\\checks.json",
+    "bytes": 2494
+  },
+  {
+    "path": "outputs\\context-reproduction-20261109\\frozen_models.json",
+    "bytes": 931
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\config.json",
+    "bytes": 1658
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-1-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\events.jsonl",
+    "bytes": 12509
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\final_optimizer.pt",
+    "bytes": 871309677
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\prepare.py",
+    "bytes": 3929
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\run.py",
+    "bytes": 9800
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\summary.json",
+    "bytes": 6043
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\trajectory.json",
+    "bytes": 3612
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\config.json",
+    "bytes": 1451
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-1-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\events.jsonl",
+    "bytes": 12765
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\final_optimizer.pt",
+    "bytes": 871309677
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\run.py",
+    "bytes": 10139
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\summary.json",
+    "bytes": 4480
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\trajectory.json",
+    "bytes": 3967
+  },
+  {
+    "path": "outputs\\context-top2-overfit-diagnostic\\gradients.json",
+    "bytes": 140130
+  },
+  {
+    "path": "outputs\\context-top2-overfit-diagnostic\\overfit.py",
+    "bytes": 8214
+  },
+  {
+    "path": "outputs\\context-top2-overfit-diagnostic\\selection.json",
+    "bytes": 14611
+  },
+  {
+    "path": "outputs\\context-top2-overfit-diagnostic\\summary.json",
+    "bytes": 5261
+  },
+  {
+    "path": "outputs\\context-top2-overfit-diagnostic\\trajectory.json",
+    "bytes": 3051
+  },
+  {
+    "path": "outputs\\context-top2-pilot\\metrics.json",
+    "bytes": 352
+  },
+  {
+    "path": "outputs\\context-top2-pilot\\predictions.json",
+    "bytes": 473066
+  },
+  {
+    "path": "outputs\\context-top2-pilot\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-pilot-diagnostic\\diagnose.py",
+    "bytes": 5918
+  },
+  {
+    "path": "outputs\\context-top2-pilot-diagnostic\\scores.json",
+    "bytes": 2546537
+  },
+  {
+    "path": "outputs\\context-top2-pilot-diagnostic\\summary.json",
+    "bytes": 1208
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-epoch5-ranking-diagnostic\\diagnose.py",
+    "bytes": 9051
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-epoch5-ranking-diagnostic\\internal_val_scores.csv",
+    "bytes": 1097437
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-epoch5-ranking-diagnostic\\original_rule_predictions.json",
+    "bytes": 1256228
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-epoch5-ranking-diagnostic\\positive_rule_predictions.json",
+    "bytes": 1347006
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-epoch5-ranking-diagnostic\\reranker_train_scores.csv",
+    "bytes": 1504311
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-epoch5-ranking-diagnostic\\scores.json",
+    "bytes": 6995922
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-epoch5-ranking-diagnostic\\summary.json",
+    "bytes": 3672
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\config.json",
+    "bytes": 1478
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-1-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\events.jsonl",
+    "bytes": 13589
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\final_optimizer.pt",
+    "bytes": 871309677
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\prepare.py",
+    "bytes": 4147
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\run.py",
+    "bytes": 10334
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\summary.json",
+    "bytes": 6271
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\trajectory.json",
+    "bytes": 3611
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\zero_head_check.json",
+    "bytes": 254
+  },
+  {
+    "path": "outputs\\context-top2-train-diagnostic\\diagnose.py",
+    "bytes": 4868
+  },
+  {
+    "path": "outputs\\context-top2-train-diagnostic\\scores.json",
+    "bytes": 2403119
+  },
+  {
+    "path": "outputs\\context-top2-train-diagnostic\\summary.json",
+    "bytes": 1263
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\commands.json",
+    "bytes": 3347
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\data.zip.metadata.json",
+    "bytes": 1660
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\download_artifacts.py",
+    "bytes": 2635
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\download_public_assets.py",
+    "bytes": 1111
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\environment.json",
+    "bytes": 356
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\extracted_manifest.json",
+    "bytes": 4212
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\final.zip.metadata.json",
+    "bytes": 1683
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\final_audit.json",
+    "bytes": 2536
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\final_audit.py",
+    "bytes": 4911
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\inference.zip",
+    "bytes": 21130115
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\inspect_archives.py",
+    "bytes": 1521
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\internal_val_baseline.log",
+    "bytes": 165
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\internal_val_candidates.log",
+    "bytes": 187
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\internal_val_checks.log",
+    "bytes": 1222
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\local_archive_inspection.json",
+    "bytes": 4257
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\offline_tests.log",
+    "bytes": 1416
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\preflight.json",
+    "bytes": 900
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\preflight.py",
+    "bytes": 1959
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\prepare_artifacts.py",
+    "bytes": 1639
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\reranker_train_candidates.log",
+    "bytes": 192
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\reranker_train_checks.log",
+    "bytes": 986
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\run_validation.py",
+    "bytes": 1853
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\status.md",
+    "bytes": 4700
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\validate_outputs.py",
+    "bytes": 6044
+  },
+  {
+    "path": "outputs\\official-dev\\dev_candidates.json",
+    "bytes": 99767648
+  },
+  {
+    "path": "outputs\\official-dev\\dev_candidates.zip",
+    "bytes": 10164365
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-1\\internal_val_predictions.json",
+    "bytes": 500447
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-1\\metrics.json",
+    "bytes": 665
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-1\\reranker_train_scores.json",
+    "bytes": 1673982
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-1\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-2\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-2\\metrics.json",
+    "bytes": 662
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-2\\reranker_train_scores.json",
+    "bytes": 1678093
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-2\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-2\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-3\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-3\\metrics.json",
+    "bytes": 665
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-3\\reranker_train_scores.json",
+    "bytes": 1672330
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-3\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-3\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-4\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-4\\metrics.json",
+    "bytes": 665
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-4\\reranker_train_scores.json",
+    "bytes": 1673274
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-4\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-4\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-5\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-5\\metrics.json",
+    "bytes": 667
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-5\\reranker_train_scores.json",
+    "bytes": 1669329
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-5\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-balanced-five-epoch-diagnostic\\epoch-5\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-1\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-1\\metrics.json",
+    "bytes": 992
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-1\\reranker_train_scores.json",
+    "bytes": 1692563
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-1\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-2\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-2\\metrics.json",
+    "bytes": 665
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-2\\reranker_train_scores.json",
+    "bytes": 1673197
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-2\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-2\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-3\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-3\\metrics.json",
+    "bytes": 665
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-3\\reranker_train_scores.json",
+    "bytes": 1672313
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-3\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-3\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-4\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-4\\metrics.json",
+    "bytes": 666
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-4\\reranker_train_scores.json",
+    "bytes": 1673151
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-4\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-4\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-5\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-5\\metrics.json",
+    "bytes": 665
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-5\\reranker_train_scores.json",
+    "bytes": 1673252
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-5\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-five-epoch-diagnostic\\epoch-5\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-1\\internal_val_predictions.json",
+    "bytes": 500447
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-1\\metrics.json",
+    "bytes": 663
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-1\\reranker_train_scores.json",
+    "bytes": 1673338
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-1\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-2\\internal_val_predictions.json",
+    "bytes": 500506
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-2\\metrics.json",
+    "bytes": 665
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-2\\reranker_train_scores.json",
+    "bytes": 1670574
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-2\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-2\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-3\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-3\\metrics.json",
+    "bytes": 667
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-3\\reranker_train_scores.json",
+    "bytes": 1692444
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-3\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-3\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-4\\internal_val_predictions.json",
+    "bytes": 500462
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-4\\metrics.json",
+    "bytes": 665
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-4\\reranker_train_scores.json",
+    "bytes": 1682780
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-4\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-4\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-5\\internal_val_predictions.json",
+    "bytes": 500516
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-5\\metrics.json",
+    "bytes": 663
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-5\\reranker_train_scores.json",
+    "bytes": 1669483
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-5\\training-order.json",
+    "bytes": 271284
+  },
+  {
+    "path": "outputs\\context-top2-span-mean-five-epoch-diagnostic\\epoch-5\\weights.pt",
+    "bytes": 435651569
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\inference\\internal_val_candidates.json",
+    "bytes": 85820266
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\inference\\internal_val_metrics.json",
+    "bytes": 212
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\inference\\internal_val_predictions.json",
+    "bytes": 499164
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\inference\\internal_val_validation.json",
+    "bytes": 1222
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\inference\\reranker_train_candidates.json",
+    "bytes": 118180273
+  },
+  {
+    "path": "outputs\\issue7-validation-20261104\\inference\\reranker_train_validation.json",
+    "bytes": 986
+  },
+  {
+    "path": "data\\dev-v1.1.json",
+    "bytes": 4854279
+  },
+  {
+    "path": "data\\train-v1.1.json",
+    "bytes": 30288272
+  },
+  {
+    "path": "data\\splits\\bert_train.json",
+    "bytes": 22736897
+  },
+  {
+    "path": "data\\splits\\internal_val.json",
+    "bytes": 3101408
+  },
+  {
+    "path": "data\\splits\\reranker_train.json",
+    "bytes": 4360389
+  },
+  {
+    "path": "data\\tokenized\\bert_train\\data-00000-of-00001.arrow",
+    "bytes": 344837680
+  },
+  {
+    "path": "data\\tokenized\\bert_train\\dataset_info.json",
+    "bytes": 958
+  },
+  {
+    "path": "data\\tokenized\\bert_train\\state.json",
+    "bytes": 259
+  },
+  {
+    "path": "data\\tokenized\\dev\\data-00000-of-00001.arrow",
+    "bytes": 56288584
+  },
+  {
+    "path": "data\\tokenized\\dev\\dataset_info.json",
+    "bytes": 958
+  },
+  {
+    "path": "data\\tokenized\\dev\\state.json",
+    "bytes": 259
+  },
+  {
+    "path": "data\\tokenized\\internal_val\\data-00000-of-00001.arrow",
+    "bytes": 47895680
+  },
+  {
+    "path": "data\\tokenized\\internal_val\\dataset_info.json",
+    "bytes": 958
+  },
+  {
+    "path": "data\\tokenized\\internal_val\\state.json",
+    "bytes": 259
+  },
+  {
+    "path": "data\\tokenized\\reranker_train\\data-00000-of-00001.arrow",
+    "bytes": 65863192
+  },
+  {
+    "path": "data\\tokenized\\reranker_train\\dataset_info.json",
+    "bytes": 958
+  },
+  {
+    "path": "data\\tokenized\\reranker_train\\state.json",
+    "bytes": 259
+  },
+  {
+    "path": "checkpoints\\bert-base-baseline\\final\\config.json",
+    "bytes": 627
+  },
+  {
+    "path": "checkpoints\\bert-base-baseline\\final\\model.safetensors",
+    "bytes": 435596088
+  },
+  {
+    "path": "checkpoints\\bert-base-baseline\\final\\special_tokens_map.json",
+    "bytes": 125
+  },
+  {
+    "path": "checkpoints\\bert-base-baseline\\final\\tokenizer.json",
+    "bytes": 711396
+  },
+  {
+    "path": "checkpoints\\bert-base-baseline\\final\\tokenizer_config.json",
+    "bytes": 1221
+  },
+  {
+    "path": "checkpoints\\bert-base-baseline\\final\\training_args.bin",
+    "bytes": 5905
+  },
+  {
+    "path": "checkpoints\\bert-base-baseline\\final\\vocab.txt",
+    "bytes": 231508
+  }
+]

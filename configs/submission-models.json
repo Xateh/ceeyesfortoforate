@@ -1,0 +1,8 @@
+{
+  "basic": {
+    "binding_sha256": "a72b2e5de6c0f7fe85f32fdda4369d4c90dd46ab5960c799528f41747fca1f6a"
+  },
+  "full": {
+    "binding_sha256": "352d9ecbcd090efe13cc12d0050c8deca1f45b6ce03e4608412005367b3580cc"
+  }
+}

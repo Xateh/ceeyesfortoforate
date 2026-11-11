@@ -26,3 +26,13 @@ wandb/
 *.pth
 *.ckpt
 *.safetensors
+
+# Submission companions and immutable local evidence (supplied in ZIPs, not Git)
+assets/
+inputs/
+originals/
+results/
+course/*.pdf
+course/*.docx
+verification/
+*.zip
