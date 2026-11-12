@@ -132,6 +132,9 @@ updates preprocessing. It checks model/source hashes, feature identity/order, ge
 settings, internal_val role and BERT/reranker-training exclusions. New compatible
 batches need not match old validation bytes. A hash inside its own artifact is not
 an independent trust anchor. The real runner has no official-dev inference path.
+For the separate frozen comparison path, see the
+[official-dev evaluation](official-dev-evaluation.md). It loads pinned models
+without fitting and leaves this runner's train/internal-validation roles unchanged.
 
 ## Tests and current result
 

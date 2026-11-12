@@ -1,0 +1,155 @@
+{
+  "schema": "cs4248.frozen-official-dev-comparison/1",
+  "status": "frozen_before_local_official_dev_inference",
+  "selection": "Fix train20/eval20 for matched pools; select alpha by internal_val F1 then EM then first configured alpha within basic_no_length and full_no_length. Exclude logits-only control from main feature-based systems. Add raw-length basic at the same alpha as basic_no_length for a controlled ablation.",
+  "selection_results": {
+    "path": "outputs/reranker-exploration/complete.json",
+    "sha256": "23517978ddeba73a1792cf6ac2eabadd70caaa90ab13be86b1bc263c754afd07"
+  },
+  "models": [
+    {
+      "id": "basic_no_length",
+      "role": "main",
+      "model": {
+        "path": "outputs/reranker-exploration/basic_no_length-train20-alpha0.1/model.json",
+        "sha256": "5ac9b1629cb23334d58e2b50f37c8906a34f69dbfb9c5e7be7dc52fdb1243708"
+      },
+      "features": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "answer_has_digit",
+        "answer_initial_upper"
+      ],
+      "alpha": 0.1,
+      "train_top_k": 20,
+      "eval_top_k": 20,
+      "internal_validation": {
+        "exact": 65.2721498192969,
+        "f1": 79.25597215812682,
+        "total": 9131
+      }
+    },
+    {
+      "id": "full_no_length",
+      "role": "main",
+      "model": {
+        "path": "outputs/reranker-exploration/full_no_length-train20-alpha0.1/model.json",
+        "sha256": "b85f3e42d9ead58460a578fd57b54bcf7f5bf751efbb8471c73a6db6dbd550f8"
+      },
+      "features": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "answer_has_digit",
+        "answer_initial_upper",
+        "q_who",
+        "q_what",
+        "q_when",
+        "q_where",
+        "q_why",
+        "q_how",
+        "q_which",
+        "q_other",
+        "when_digit_match",
+        "who_initial_upper_match"
+      ],
+      "alpha": 0.1,
+      "train_top_k": 20,
+      "eval_top_k": 20,
+      "internal_validation": {
+        "exact": 65.25024641331727,
+        "f1": 79.23389260455397,
+        "total": 9131
+      }
+    },
+    {
+      "id": "basic_raw_length_matched_alpha",
+      "role": "length_ablation",
+      "model": {
+        "path": "outputs/reranker-exploration/basic_raw_length-train20-alpha0.1/model.json",
+        "sha256": "830eed09e0ca13906704843d380edc03df7be9a4a749afb6ae20ecb9ab4adbc3"
+      },
+      "features": [
+        "bert_start_logit",
+        "bert_end_logit",
+        "span_token_count",
+        "answer_has_digit",
+        "answer_initial_upper"
+      ],
+      "alpha": 0.1,
+      "train_top_k": 20,
+      "eval_top_k": 20,
+      "internal_validation": {
+        "exact": 65.7102179388895,
+        "f1": 78.5752968899681,
+        "total": 9131
+      }
+    }
+  ],
+  "baseline": {
+    "checkpoint_path": "final",
+    "checkpoint_files": {
+      "config.json": {
+        "path": "final/config.json",
+        "sha256": "d2e7e128461dc7c5716f1c8296d17596c6405900bf98a3206ad54e85307f602e"
+      },
+      "model.safetensors": {
+        "path": "final/model.safetensors",
+        "sha256": "05c8285ac4ad2346f68f9c48d726f31352240792e94b39de745961595aa7cc61"
+      },
+      "special_tokens_map.json": {
+        "path": "final/special_tokens_map.json",
+        "sha256": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3"
+      },
+      "tokenizer.json": {
+        "path": "final/tokenizer.json",
+        "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"
+      },
+      "tokenizer_config.json": {
+        "path": "final/tokenizer_config.json",
+        "sha256": "1f92c93d2e31974acffab86d48e80a9357acb18c68346c5472ef1d12c72d5d77"
+      },
+      "training_args.bin": {
+        "path": "final/training_args.bin",
+        "sha256": "8eb699448a3775a600c105282a91cb58d00c7d3d4aa80ff1f0222c7a7d669c2c"
+      },
+      "vocab.txt": {
+        "path": "final/vocab.txt",
+        "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+      }
+    }
+  },
+  "data": {
+    "path": "data/dev-v1.1.json",
+    "sha256": "95aa6a52d5d6a735563366753ca50492a658031da74f301ac5238b03966972c9"
+  },
+  "tokenized_dev_files": {
+    "data-00000-of-00001.arrow": {
+      "path": "data/tokenized/dev/data-00000-of-00001.arrow",
+      "sha256": "cbc9a7385f76c777b79ff47b26eeeee2a7e067c1e9cb76955f6ad94f8cee55ad"
+    },
+    "dataset_info.json": {
+      "path": "data/tokenized/dev/dataset_info.json",
+      "sha256": "240f81b5a4ab47327e307e540346cbe26fc6460a5a9bebdfcaef58807199fbeb"
+    },
+    "state.json": {
+      "path": "data/tokenized/dev/state.json",
+      "sha256": "1fbc1c7b31780279d97a51b347c1ac776a3e300a5e6489f564478c9cdef95311"
+    }
+  },
+  "generation": {
+    "max_answer_length": 30,
+    "n_best": 20,
+    "max_candidates": 20,
+    "batch_size": 8,
+    "device": "cpu",
+    "torch_threads": 4,
+    "max_context_only": false,
+    "tie_break": "first occurrence in baseline traversal"
+  },
+  "evaluation_history": "BERT official-dev scores already appear in docs/eval.md. This is a frozen limited local comparison, not a claim of a previously untouched dev set.",
+  "source_status": "Local model bytes pinned; original training-to-export checkpoint provenance remains unverified.",
+  "exporter": {
+    "path": "scripts/bert_predict.py",
+    "sha256": "03bd31ddcbcf17a37be3c069edf330380d6a1f6f27a1d674045af06a9280526b"
+  }
+}

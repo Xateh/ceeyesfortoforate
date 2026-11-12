@@ -1,0 +1,9 @@
+{
+  "fits": 56,
+  "evaluations": 84,
+  "prior_alpha1_reference_cases_matched": 6,
+  "config_and_software_hashes_match": true,
+  "all_model_hashes_match": true,
+  "all_runs_exact_reload_equivalence": true,
+  "all_prediction_files_exist": true
+}

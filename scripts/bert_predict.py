@@ -14,6 +14,7 @@ Usage:
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -39,9 +40,11 @@ def main():
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--candidates", action="store_true",
                         help="Save up to 20 unique spans per question without evaluating gold answers.")
+    parser.add_argument("--log-every", type=int, default=10,
+                        help="Print inference progress every N batches; 0 disables progress.")
     args = parser.parse_args()
-    if args.max_answer_length < 1 or args.batch_size < 1:
-        parser.error("--max-answer-length and --batch-size must be positive")
+    if args.max_answer_length < 1 or args.batch_size < 1 or args.log_every < 0:
+        parser.error("Answer length/batch size must be positive and --log-every nonnegative")
     if args.split == "reranker_train" and not args.candidates:
         parser.error("reranker_train requires --candidates")
     examples_path, features_path = EXAMPLES[args.split], f"data/tokenized/{args.split}"
@@ -61,11 +64,18 @@ def main():
     # start/end scores for every window.
     inputs = features.select_columns(["input_ids", "token_type_ids", "attention_mask"])
     start_logits, end_logits = [], []
+    started = time.monotonic()
+    total_batches = (len(inputs) + args.batch_size - 1) // args.batch_size
+    print(f"Predicting {len(inputs)} windows on {device}, {total_batches} batches...", flush=True)
     with torch.no_grad():
-        for batch in inputs.with_format("torch").iter(batch_size=args.batch_size):
+        for batch_index, batch in enumerate(inputs.with_format("torch").iter(batch_size=args.batch_size), 1):
             output = model(**{key: value.long().to(device) for key, value in batch.items()})
             start_logits.append(output.start_logits.cpu().numpy())
             end_logits.append(output.end_logits.cpu().numpy())
+            if args.log_every and (batch_index % args.log_every == 0 or batch_index == total_batches):
+                elapsed = time.monotonic() - started
+                eta = elapsed / batch_index * (total_batches - batch_index)
+                print(f"Batch {batch_index}/{total_batches}; elapsed {elapsed:.0f}s; ETA {eta:.0f}s", flush=True)
     start_logits, end_logits = np.concatenate(start_logits), np.concatenate(end_logits)
 
     examples = load_examples(examples_path)

@@ -1,0 +1,116 @@
+{
+  "method": "Paired article-cluster bootstrap: sample 48 articles with replacement; retain all their questions; recompute question-weighted metric differences. Percentile intervals are descriptive, not evidence of an untouched test set.",
+  "articles": 48,
+  "questions": 10570,
+  "resamples": 5000,
+  "seed": 4248,
+  "comparisons": [
+    {
+      "left": "basic_no_length",
+      "right": "bert_baseline",
+      "changed_answer_texts": 397,
+      "em_corrected": 50,
+      "em_broken": 58,
+      "exact": {
+        "delta_pp": -0.07568590350047304,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.25101686516230426,
+          0.096297303092823
+        ]
+      },
+      "f1": {
+        "delta_pp": -0.028892982582185287,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.13938430587840894,
+          0.07278551446275267
+        ]
+      }
+    },
+    {
+      "left": "full_no_length",
+      "right": "bert_baseline",
+      "changed_answer_texts": 409,
+      "em_corrected": 50,
+      "em_broken": 53,
+      "exact": {
+        "delta_pp": -0.02838221381267739,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.2108297861936935,
+          0.1483602267414642
+        ]
+      },
+      "f1": {
+        "delta_pp": -0.025138291568398283,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.14071950517854506,
+          0.08374517884974786
+        ]
+      }
+    },
+    {
+      "left": "basic_raw_length_matched_alpha",
+      "right": "bert_baseline",
+      "changed_answer_texts": 1190,
+      "em_corrected": 301,
+      "em_broken": 273,
+      "exact": {
+        "delta_pp": 0.26490066225165565,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.5246200225349412,
+          1.0416311726462544
+        ]
+      },
+      "f1": {
+        "delta_pp": -0.35492362777301995,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.8070982368459205,
+          0.06896753233215071
+        ]
+      }
+    },
+    {
+      "left": "basic_no_length",
+      "right": "basic_raw_length_matched_alpha",
+      "changed_answer_texts": 1284,
+      "em_corrected": 263,
+      "em_broken": 299,
+      "exact": {
+        "delta_pp": -0.34058656575212864,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -1.0585833966522513,
+          0.4201937901225723
+        ]
+      },
+      "f1": {
+        "delta_pp": 0.32603064519083474,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.09097322715821025,
+          0.7761194428894442
+        ]
+      }
+    },
+    {
+      "left": "full_no_length",
+      "right": "basic_no_length",
+      "changed_answer_texts": 84,
+      "em_corrected": 10,
+      "em_broken": 5,
+      "exact": {
+        "delta_pp": 0.04730368968779565,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.028958788954437764,
+          0.13266315145088364
+        ]
+      },
+      "f1": {
+        "delta_pp": 0.003754691013786993,
+        "article_bootstrap_95_percentile_interval_pp": [
+          -0.046498677061694776,
+          0.051550489328319175
+        ]
+      }
+    }
+  ],
+  "complete_sha256": "60ca2c6296b43b27a67bafddb1b1faccf021fd7f4135a7be5c9f186c205e015a",
+  "script_sha256": "62ca04a5ef0f2ffff65ae84493cb3091781ee3fce3c14e6e6ea721d348bbfba0"
+}
