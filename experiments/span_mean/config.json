@@ -1,0 +1,40 @@
+{
+  "seed": 4248,
+  "epochs": 5,
+  "prespecified_comparison_epoch": 5,
+  "batch_size": 4,
+  "gpu": "NVIDIA GeForce RTX 5060 Ti",
+  "torch_version": "2.8.0+cu128",
+  "checkpoint": "C:\\Users\\Gooey\\OneDrive\\Documents\\GitHub\\ceeyesfortoforate\\checkpoints\\bert-base-baseline\\final",
+  "original_pilot_weights_sha256": "64b2b5725953e0a410086239887cf6d03fad787ebe4fcfe48405d16ee79c34ad",
+  "optimizer": "AdamW",
+  "optimizer_defaults": {
+    "lr": 2e-05,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-08,
+    "weight_decay": 0.01,
+    "amsgrad": false,
+    "maximize": false,
+    "foreach": null,
+    "capturable": false,
+    "differentiable": false,
+    "fused": null,
+    "decoupled_weight_decay": true
+  },
+  "pooling": "span_mean",
+  "gradient_clip_norm": 1.0,
+  "scheduler": null,
+  "training_questions": 12516,
+  "informative_pairs": 8751,
+  "epoch_order": "pilot shuffle at epoch 1; in-place shuffle using continuing Python RNG at epochs 2-5",
+  "sampling": "all 8751 informative pairs once per epoch, no balancing or resampling",
+  "decision_rule": "candidate 2 iff Python-float (score2-score1) > original BERT gap",
+  "original_pilot_hashes": {
+    "metrics.json": "d1ce7b121e32c66cb96e7da2ed9a6ee6839567025c000659e341e365dce8cc8f",
+    "predictions.json": "544a49aa3457b1530be7d593a33bb9ff12809e386268f9d1b2f73590d9907f15",
+    "weights.pt": "64b2b5725953e0a410086239887cf6d03fad787ebe4fcfe48405d16ee79c34ad"
+  }
+}

@@ -1,0 +1,224 @@
+{
+  "pooling": "span_mean",
+  "prespecified_comparison_epoch": 5,
+  "baseline": {
+    "exact": 65.40357025517469,
+    "f1": 79.28779355979084
+  },
+  "trajectory": [
+    {
+      "epoch": 1,
+      "optimizer_steps": 2188,
+      "train_groups": [
+        {
+          "gold_winner": 1,
+          "pairs": 6516,
+          "mean_weighted_pairwise_loss": 0.0722350210441443,
+          "median_absolute_learned_difference": 0.0001287795603275299,
+          "switches_to_candidate_2": 0
+        },
+        {
+          "gold_winner": 2,
+          "pairs": 2235,
+          "mean_weighted_pairwise_loss": 0.4836527404324329,
+          "median_absolute_learned_difference": 0.00012001395225524902,
+          "switches_to_candidate_2": 0
+        }
+      ],
+      "internal_val": {
+        "exact": 65.4145219581645,
+        "f1": 79.29248714678646,
+        "changed": 1,
+        "fixed": 1,
+        "broken": 0
+      }
+    },
+    {
+      "epoch": 2,
+      "optimizer_steps": 4376,
+      "train_groups": [
+        {
+          "gold_winner": 1,
+          "pairs": 6516,
+          "mean_weighted_pairwise_loss": 0.07218254543992719,
+          "median_absolute_learned_difference": 0.00036956463009119034,
+          "switches_to_candidate_2": 0
+        },
+        {
+          "gold_winner": 2,
+          "pairs": 2235,
+          "mean_weighted_pairwise_loss": 0.48354803513520933,
+          "median_absolute_learned_difference": 0.0003542602062225342,
+          "switches_to_candidate_2": 3
+        }
+      ],
+      "internal_val": {
+        "exact": 65.40357025517469,
+        "f1": 79.2845080488939,
+        "changed": 1,
+        "fixed": 0,
+        "broken": 0
+      }
+    },
+    {
+      "epoch": 3,
+      "optimizer_steps": 6564,
+      "train_groups": [
+        {
+          "gold_winner": 1,
+          "pairs": 6516,
+          "mean_weighted_pairwise_loss": 0.07222961808364721,
+          "median_absolute_learned_difference": 2.9060058295726776e-05,
+          "switches_to_candidate_2": 0
+        },
+        {
+          "gold_winner": 2,
+          "pairs": 2235,
+          "mean_weighted_pairwise_loss": 0.48363693856000817,
+          "median_absolute_learned_difference": 2.8936192393302917e-05,
+          "switches_to_candidate_2": 0
+        }
+      ],
+      "internal_val": {
+        "exact": 65.40357025517469,
+        "f1": 79.28779355979084,
+        "changed": 0,
+        "fixed": 0,
+        "broken": 0
+      }
+    },
+    {
+      "epoch": 4,
+      "optimizer_steps": 8752,
+      "train_groups": [
+        {
+          "gold_winner": 1,
+          "pairs": 6516,
+          "mean_weighted_pairwise_loss": 0.07221956110458297,
+          "median_absolute_learned_difference": 0.0001833699643611908,
+          "switches_to_candidate_2": 0
+        },
+        {
+          "gold_winner": 2,
+          "pairs": 2235,
+          "mean_weighted_pairwise_loss": 0.4836329849418128,
+          "median_absolute_learned_difference": 0.00015293806791305542,
+          "switches_to_candidate_2": 1
+        }
+      ],
+      "internal_val": {
+        "exact": 65.40357025517469,
+        "f1": 79.28779355979084,
+        "changed": 0,
+        "fixed": 0,
+        "broken": 0
+      }
+    },
+    {
+      "epoch": 5,
+      "optimizer_steps": 10940,
+      "train_groups": [
+        {
+          "gold_winner": 1,
+          "pairs": 6516,
+          "mean_weighted_pairwise_loss": 0.07212149743079703,
+          "median_absolute_learned_difference": 0.000519581139087677,
+          "switches_to_candidate_2": 0
+        },
+        {
+          "gold_winner": 2,
+          "pairs": 2235,
+          "mean_weighted_pairwise_loss": 0.48346759473313256,
+          "median_absolute_learned_difference": 0.0005324631929397583,
+          "switches_to_candidate_2": 4
+        }
+      ],
+      "internal_val": {
+        "exact": 65.4145219581645,
+        "f1": 79.2956129225549,
+        "changed": 3,
+        "fixed": 1,
+        "broken": 0
+      }
+    }
+  ],
+  "zero_head_check": {
+    "reranker_train": {
+      "questions": 12516,
+      "all_scores_zero": true,
+      "predictions_identical_to_bert": true
+    },
+    "internal_val": {
+      "questions": 9131,
+      "all_scores_zero": true,
+      "predictions_identical_to_bert": true
+    }
+  },
+  "epoch_5_comparison": {
+    "epoch": 5,
+    "original_cls": {
+      "epoch": 5,
+      "optimizer_steps": 10940,
+      "train_groups": [
+        {
+          "gold_winner": 1,
+          "pairs": 6516,
+          "mean_weighted_pairwise_loss": 0.07222890203220211,
+          "median_absolute_learned_difference": 4.276633262634277e-06,
+          "switches_to_candidate_2": 0
+        },
+        {
+          "gold_winner": 2,
+          "pairs": 2235,
+          "mean_weighted_pairwise_loss": 0.48363883698169535,
+          "median_absolute_learned_difference": 4.26173210144043e-06,
+          "switches_to_candidate_2": 0
+        }
+      ],
+      "internal_val": {
+        "exact": 65.40357025517469,
+        "f1": 79.28779355979084,
+        "changed": 0,
+        "fixed": 0,
+        "broken": 0
+      }
+    },
+    "span_mean": {
+      "epoch": 5,
+      "optimizer_steps": 10940,
+      "train_groups": [
+        {
+          "gold_winner": 1,
+          "pairs": 6516,
+          "mean_weighted_pairwise_loss": 0.07212149743079703,
+          "median_absolute_learned_difference": 0.000519581139087677,
+          "switches_to_candidate_2": 0
+        },
+        {
+          "gold_winner": 2,
+          "pairs": 2235,
+          "mean_weighted_pairwise_loss": 0.48346759473313256,
+          "median_absolute_learned_difference": 0.0005324631929397583,
+          "switches_to_candidate_2": 4
+        }
+      ],
+      "internal_val": {
+        "exact": 65.4145219581645,
+        "f1": 79.2956129225549,
+        "changed": 3,
+        "fixed": 1,
+        "broken": 0
+      }
+    },
+    "internal_val_delta": {
+      "exact": 0.010951702989814294,
+      "f1": 0.00781936276405304,
+      "changed": 3,
+      "fixed": 1,
+      "broken": 0
+    }
+  },
+  "all_epoch_pair_orders_match_reference": true,
+  "completed_pilot_preserved": true,
+  "official_dev_used": false
+}

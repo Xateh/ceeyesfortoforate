@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "objective": "question_centered_ridge",
+  "features": {
+    "basic": [
+      "bert_start_logit",
+      "bert_end_logit",
+      "span_token_count",
+      "answer_has_digit",
+      "answer_initial_upper"
+    ],
+    "compatibility": [
+      "q_who",
+      "q_what",
+      "q_when",
+      "q_where",
+      "q_why",
+      "q_how",
+      "q_which",
+      "q_other",
+      "when_digit_match",
+      "who_initial_upper_match"
+    ],
+    "group": "basic"
+  },
+  "alpha": 1.0,
+  "no_signal": "error",
+  "state": {
+    "mean": [
+      3.0886975186328547,
+      3.3713345273529756,
+      9.58895413870246,
+      0.2326382230744647,
+      0.36451342281879195
+    ],
+    "scale": [
+      3.5511797796307674,
+      3.6139901368298197,
+      7.812878628266528,
+      0.4225135266937839,
+      0.4812934524837431
+    ],
+    "coef": [
+      0.03423304200304481,
+      0.03470781200543064,
+      -0.03482611238016738,
+      -0.002185873519510228,
+      -0.0018179068611291148
+    ],
+    "training_questions": 12516,
+    "informative_questions": 12393
+  }
+}

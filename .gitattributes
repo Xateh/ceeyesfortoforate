@@ -1,0 +1,10 @@
+# Frozen bindings pin exact source bytes; retain the submitted byte representation.
+reranker/real_training.py -text
+reranker/core.py -text
+reranker/team_candidates.py -text
+offline_handoff/contract.py -text
+evaluate-v2.0.py -text
+scripts/squad_eval.py -text
+course/evaluate-v2.0.py -text
+frozen/** -text
+configs/submission-models.json -text

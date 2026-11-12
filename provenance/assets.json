@@ -1,0 +1,30 @@
+{
+  "data.zip": {
+    "bytes": 58488042,
+    "sha256": "bd9577c8dcd7d192c61d2a802e3b8cff10d71e1b1b57cdc5e64bbc4c9e0d245c",
+    "release_tag": "data-v1",
+    "url": "https://github.com/Xateh/ceeyesfortoforate/releases/download/data-v1/data.zip",
+    "source": "existing local archive; no new download"
+  },
+  "inference.zip": {
+    "bytes": 21130115,
+    "sha256": "5505d15d37b26269a383c8adb6ce22ffecced629b636312ebd77cd3ffd19baf1",
+    "release_tag": "candidate-exports-v1",
+    "url": "https://github.com/Xateh/ceeyesfortoforate/releases/download/candidate-exports-v1/inference.zip",
+    "source": "existing local archive; no new download"
+  },
+  "final.zip": {
+    "bytes": 403707864,
+    "sha256": "a8cf3d7fe9ec5fc07a240353d7d858cc8e4c0dac76bbbee57c982852e8601662",
+    "release_tag": "bert-finetuned-v1",
+    "url": "https://github.com/Xateh/ceeyesfortoforate/releases/download/bert-finetuned-v1/final.zip",
+    "source": "existing local archive; no new download"
+  },
+  "dev_candidates.zip": {
+    "bytes": 10164365,
+    "sha256": "937d894b7e6c5108aca4eefc8d800b5f6e535ebe86dd9afe8f4e87599daa3127",
+    "release_tag": null,
+    "url": null,
+    "source": "existing local archive; no new download"
+  }
+}

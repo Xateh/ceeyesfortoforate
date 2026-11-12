@@ -18,9 +18,10 @@ CANDIDATE = ('answer', 'start', 'end', 'window_index', 'start_token_index',
 TIE = 'first occurrence in baseline traversal'
 
 
-def _metadata(meta):
+def _metadata(meta, *, allow_dev=False):
     c.keys(meta, META, 'PR28 metadata')
-    c.require(meta['split'] in ('reranker_train', 'internal_val'), 'only train/internal_val adaptation enabled')
+    allowed = ('reranker_train', 'internal_val', 'dev') if allow_dev else ('reranker_train', 'internal_val')
+    c.require(meta['split'] in allowed, 'only train/internal_val adaptation enabled unless dev explicitly enabled')
     for key in ('checkpoint', 'examples_path', 'features_path', 'device', 'numpy_version', 'torch_version'):
         c.text(meta[key], key, True)
     for key in ('max_answer_length', 'n_best', 'max_candidates', 'batch_size'):
@@ -46,7 +47,7 @@ def _score(span, scalar):
         raise c.ContractError('logit dtype overflow') from exc
 
 
-def adapt_export(raw, *, group, baseline=None):
+def adapt_export(raw, *, group, baseline=None, allow_dev=False):
     """Preserve team order; return strict core records plus separate audit data.
 
     Baseline comparison is optional and independently supplied. Paths and metadata
@@ -55,7 +56,7 @@ def adapt_export(raw, *, group, baseline=None):
     data = c.decode(raw)
     c.keys(data, ('schema_version', 'metadata', 'questions'), 'PR28 export')
     c.require(type(data['schema_version']) is int and data['schema_version'] == 1, 'unsupported candidate schema')
-    meta = data['metadata']; scalar = _metadata(meta); config = c.feature_config(group)
+    meta = data['metadata']; scalar = _metadata(meta, allow_dev=allow_dev); config = c.feature_config(group)
     c.require(type(data['questions']) is list and data['questions'], 'nonempty questions required')
     records, origins, seen, articles, contexts = [], [], set(), set(), set()
     window_owners = {}

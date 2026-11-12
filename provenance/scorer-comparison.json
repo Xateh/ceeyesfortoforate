@@ -1,0 +1,7 @@
+{
+  "course_sha256": "710840ce2c2c61716334c056777032f24660b83eb9869a451036e6a24d8103c4",
+  "repository_sha256": "ad2456fd448c298bcd76af64b6d7de2eb84092030db6dcd3b4212f28cbe21c7e",
+  "byte_equal": false,
+  "equal_after_normalizing_CRLF": true,
+  "source": "Downloaded course Project/qa/evaluate-v2.0.py"
+}

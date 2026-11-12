@@ -167,8 +167,6 @@ class TeamModelTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             train,model=fit(); path=Path(tmp)/'model.json'; pin=model.save(path); before=path.read_bytes()
             with self.assertRaises(FileExistsError): model.save(path)
-            link=Path(tmp)/'link.json'; link.symlink_to(path)
-            with self.assertRaises(FileExistsError): model.save(link)
             self.assertEqual(path.read_bytes(),before)
             zeros={qid:{cid:0. for cid in row} for qid,row in labels(train).items()}; saved=copy.deepcopy(zeros)
             with self.assertRaises(ValueError):
@@ -180,6 +178,20 @@ class TeamModelTests(unittest.TestCase):
             absent=Path(tmp)/'unfitted.json'
             with self.assertRaises(ValueError): unfitted.save(absent)
             self.assertFalse(absent.exists()); self.assertEqual(c.sha256(path.read_bytes()),pin)
+
+    def test_exclusive_save_preserves_symlink_target(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _, model = fit(); path = Path(tmp) / 'model.json'
+            model.save(path); before = path.read_bytes()
+            link = Path(tmp) / 'link.json'
+            try:
+                link.symlink_to(path)
+            except OSError as exc:
+                if getattr(exc, 'winerror', None) == 1314:
+                    self.skipTest('Windows account lacks symbolic-link privilege (WinError 1314)')
+                raise
+            with self.assertRaises(FileExistsError): model.save(link)
+            self.assertEqual(path.read_bytes(), before)
 
     def test_binding_json_key_order_does_not_change_semantics(self):
         with tempfile.TemporaryDirectory() as tmp:
